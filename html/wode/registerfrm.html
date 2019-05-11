@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css"/>
+  	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css"/>
+  <style>
+  .tijiao{
+    position: relative;
+    width: 90%;
+    display:block;
+    margin:0 auto;
+    border-radius: 5px;
+  }
+  </style>
+</head>
+<body>
+    <div class='neirou'>
+        <div class="mui-input-row">
+            <label>账号</label>
+            <input type="text" class="mui-input-clear uname" placeholder="请输入账号" value="">
+        </div>
+        <div class="mui-input-row input_yanzheng">
+          <label>密码</label>
+					<input type="text" class="mui-input-clear pwd" placeholder="请输入密码" value="">
+				</div>
+        <div class="mui-input-row input_yanzheng">
+          <label>确认密码</label>
+					<input type="text" class="mui-input-clear repwd" placeholder="请再次输入密码" value="">
+				</div>
+        <div class="footer_button">
+            <button type="button" class="mui-btn mui-btn-royal tijiao"  onclick="register()">注册</button>
+        </div>
+    </div>
+
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+  apiready = function() {
+
+  };
+  function register(){
+    var uname=$api.val($api.dom('.uname'));
+    var pwd=$api.val($api.dom('.pwd'));
+    var repwd=$api.val($api.dom('.repwd'));
+    var reg = /^[0-9a-zA-Z]*$/g;//正则表达式，必须是数字或者字母
+    if(uname != ""&&pwd != ""&&!reg.test(uname)){
+      km_toast("账号必须字母或者数字");
+    }
+    if(uname != ""&&pwd != ""&&reg.test(pwd)){
+      km_toast("密码必须字母或者数字");
+    }
+    if(uname==""||pwd==""){
+      km_toast("账号密码不能为空");
+      return
+    }
+    if(uname.length<6||pwd.length<6||reg.length<6){
+      km_toast("账号密码必须大于等于6位");
+      return
+    }
+    if(repwd!==pwd){
+      km_toast("两次密码不一致");
+      return
+    }
+    if(uname.length>=6&&pwd.length>=6&&repwd==pwd){
+      api.ajax({
+          url: km_sis('sis_url_api') +'/api/Publics/ajax_userinfo_add',
+          method: 'post',
+          headers: km_fasong_tou('api/Publics/ajax_userinfo_add', '', uname),
+          data: {
+              values: {
+                  uname: uname,
+                  pwd: pwd,
+                  repwd:repwd
+              }
+          }
+      },function(ret, err){
+          if (ret) {
+            console.log( JSON.stringify( ret ) );
+            if(ret.apizt==1){
+              var uname=ret.data.uname;
+              //km_toast('注册成功');
+              alert("注册成功")
+              api.execScript({
+                name: 'root',
+                frameName: 'login_frm',
+                script: 'setuname(\"'+uname+'\")'
+            });
+              api.closeWin({
+                  name: 'registerwin'
+              });
+            }else{
+              km_toast(ret.msg);
+            }
+          } else {
+              console.log( JSON.stringify( err ) );
+          }
+      });
+    }
+  }
+
+</script>
+</html>

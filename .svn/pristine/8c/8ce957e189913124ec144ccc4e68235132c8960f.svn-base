@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>个人中心</title>
+    <link rel="stylesheet" type="text/css" href="../../res/aui/css/aui.css" />
+    <style>
+        body {
+            background-image: url(../../img/1.jpg);
+            background-repeat: no-repeat;
+            background-size: 100% 200px;
+        }
+
+        .main {
+            position: relative;
+            width: 96%;
+            margin: 10px auto;
+            margin-top: 100px;
+        }
+
+        .aui-list .aui-list-item-title {
+            font-size: 0.8rem;
+        }
+
+        .ge_title {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: #fff;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .ge_title_wenzi {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            display: flex;
+        }
+
+        .zhuye_name {
+            position: relative;
+            width: 60%;
+            height: 25px;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .zhuye_id {
+            position: relative;
+            display: flex;
+            width: 80%;
+            height: 25px;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .wenzi {
+            position: relative;
+            width: 75%;
+            height: 50px;
+        }
+
+        .touxiang {
+            position: relative;
+            width: 25%;
+            height: 70px;
+            top: -20px;
+        }
+
+        .touxiang img {
+            width: 75%;
+            height: 60px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #fff;
+            border-radius: 5px;
+        }
+
+        .guanzhu {
+            position: relative;
+            display: flex;
+            width: 100%;
+        }
+
+        .guanzhu_son {
+            position: relative;
+            width: 33%;
+            flex: 1;
+            height: 50px;
+            text-align: center;
+            line-height: 20px;
+            margin-top: 20px;
+        }
+
+        .guanzhu_son p {
+            font-size: 12px;
+            color: #000;
+        }
+
+        .shezhi {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            top: 40px;
+            right: 20px;
+            z-index: 1000
+        }
+
+        .aui-list-item .aui-list-item-label-icon img {
+            width: 35px;
+            height: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+
+    </header>
+    <div id="app">
+        <div class="main">
+            <div class="shezhi" tapmode onclick="opensetwin()"><img src="../../img/wode/99.png" alt=""></div>
+            <div class="ge_title">
+                <div class="ge_title_wenzi">
+                    <div class="touxiang" tapmode onclick="openwinwode()"><img :src='`http://zhiboapi.mengwx.com/${userinfo.headimg}`' alt=""></div>
+                    <div class="wenzi">
+                        <!-- <div class="zhuye_name">用户名:{{userinfo.nicename}}</div>
+                        <div class="zhuye_id"><span>余额:{{userinfo.jb_sl5}}</span><span>银行余额:{{userinfo.yhye}}</span><span tapmode onclick="openfrarecharge()">充值</span></div> -->
+
+                        <div class="zhuye_id">
+                            <span>昵称:{{userinfo.nicename}}</span>
+                            <span>性别:{{userinfo.sex==1?'男':'女'}}</span>
+                            <span v-if='userinfo.user_type==2'>等级:{{userinfo.zhubo_dj}}</span>
+                            <span v-else='userinfo.user_type==1'>等级:{{userinfo.gz_dj}}</span>
+                        </div>
+                        <div class="zhuye_name">用户名:{{userinfo.uname}}</div>
+                    </div>
+                </div>
+                <div class="guanzhu">
+                    <div class="guanzhu_son">
+                        <p>0</p>
+                        <p>关注</p>
+                    </div>
+                    <div class="guanzhu_son">
+                        <p>{{userinfo.zhubo_fs_sl}}</p>
+                        <p>粉丝</p>
+                    </div>
+                    <div class="guanzhu_son">
+                        <p>{{userinfo.ljsy}}</p>
+                        <p>总收益</p>
+                    </div>
+                </div>
+            </div>
+            <section class="aui-content">
+                <ul class="aui-list aui-list-in aui-margin-b-35">
+                    <li class="aui-list-item" tapmode onclick="openaccount()">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/2.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">账户</div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item" tapmode onclick="openkaibo()">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/1.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">开播提醒</div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item" onclick="qingcacha()">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/4.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">清理缓存</div>
+                            <div class="aui-list-item-label-icon">
+                                <span id="hc"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/5.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">版本更新</div>
+                            <div class="aui-list-item-label-icon">
+                                <span id="version"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/6.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">关于我们</div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="aui-list aui-list-in aui-margin-b-35" style="margin-top:20px ">
+                    <li class="aui-list-item" onclick="tuichu()">
+                        <div class="aui-list-item-label-icon">
+                            <img src="../../img/shezhi/7.png" alt="">
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">退出登录账号</div>
+                            <div class="aui-list-item-label-icon">
+                                <!-- <span>123456789</span> -->
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script src="../../script/vue_min.js"></script>
+<script>
+    var vuedata = {
+        'userinfo': {}
+    }
+    vuedata.userinfo = $api.getStorage('userinfo');
+    //console.log(JSON.stringify(vuedata.userinfo.ljsy))
+    var app = new Vue({
+        el: '#app',
+        data: vuedata
+    })
+
+    apiready = function() {
+            km_apiready('frm');
+            cache();
+            $api.byId('version').innerHTML = 'V ' + api.appVersion;
+        }
+        //打开设置win
+    function opensetwin() {
+        api.openWin({
+            name: 'set',
+            url: 'set/index.html',
+            pageParam: {
+                name: 'test'
+            },
+            bounces: true, //页面弹动
+        });
+    }
+    //打开贡献榜win
+    function openwingongxi() {
+        api.openWin({
+            name: 'gongxianbang',
+            url: 'gongxianbang.html',
+            pageParam: {
+                name: 'test'
+            },
+            bounces: true, //页面弹动
+        });
+    }
+    //打开账户
+    function openaccount() {
+        api.openWin({
+            name: 'account_win',
+            url: './account/account_win.html',
+            pageParam: {
+                name: 'test'
+            }
+        });
+    }
+    //打开头像 我的信息win
+    function openwinwode() {
+        api.openWin({
+            name: 'wode_win',
+            url: 'wode_message/wode_win.html',
+            pageParam: {
+                name: 'test'
+            }
+        });
+    }
+    //获取缓存
+    function cache() {
+        api.getCacheSize(function(ret) {
+            var size = ret.size;
+            // $api.dom('#main').text()=size
+            // console.log(size);
+            $api.text($api.dom('#hc'), parseInt(size / 1024 / 1024 * 100) / 100 + 'M');
+
+        });
+
+    }
+
+    //清理缓存
+    function qingcacha() {
+        api.clearCache(function() {
+            api.toast({
+                msg: '清除完成'
+            });
+            cache();
+        });
+    }
+
+    function openkaibo() {
+        api.openWin({
+            name: 'kaibo',
+            url: 'kaibo.html',
+            pageParam: {
+                name: 'test'
+            },
+            bounces: true
+        });
+    }
+    //退出
+    function tuichu() {
+        var uname = $api.getStorage('uname');
+        // console.log(uname);
+        //   console.log(JSON.stringify( km_fasong_tou('api/publics/login', '', uname) ));
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/publics/logout',
+            method: 'post',
+            headers: km_fasong_tou('api/publics/logout', '', uname),
+            data: {
+                values: {
+                    uname: uname,
+                }
+            }
+        }, function(ret, err) {
+            if (ret) {
+                console.log(JSON.stringify(ret));
+                $api.setStorage('userinfo', ''); //用户名
+                $api.setStorage('uname', ''); //用户名
+                $api.setStorage('pwd', ''); //用户密码不可逆加密后的字段i
+                $api.setStorage('setting', ''); //系统基本参数
+                $api.setStorage('sessionid', ''); //本次登录会话ID
+                // $api.setStorage('zhibo_type', ''); //直播类型
+                $api.setStorage('user_lljl_id', '');//该用户进入直播间的信息
+                $api.setStorage('zhibo_data', '');//进入直播间获取的直播信息
+                $api.setStorage('lists', '');//直播列表总信息
+                $api.setStorage('bfdz', ''); //该直播间的拉流地址
+                $api.setStorage('data_id', '');//该用户进入直播间的信息id
+                $api.setStorage('data', '');//直播细表信息
+                $api.setStorage('data_user', '');//主播信息
+                $api.setStorage('data_zhibo', '');//直播细表信息
+                km_toast('退出成功');
+                api.execScript({
+                    name: 'root',
+                    script: 'qiehuanclass()'
+                });
+                api.closeToWin({
+                    name: 'root'
+                });
+                api.closeFrame({
+                    name: 'zhibo_frm'
+                });
+                api.closeFrame({
+                    name: 'guanzhu_frm'
+                });
+                api.closeFrame({
+                    name: 'xiaoxi_frm'
+                });
+
+                api.closeFrame({
+                    name: 'personal_center_frm'
+                });
+
+            } else {
+                console.log(JSON.stringify(err));
+            }
+        });
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/aui/css/aui.css"/>
+    <title>播放直播win</title>
+    <style>
+
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../res/aui/js/aui_dialog.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+apiready = function() {
+  openbf_frm();
+  //监听是否退出直播间
+  api.addEventListener({
+      name: 'keyback'
+  }, function(ret, err) {
+      closezb()
+  });
+}
+function openbf_frm(){
+  api.openFrame({
+      name: 'openbf_frm',
+      url: './openbf_frm.html',
+      rect: {
+          x: 0,
+          y: 0,
+          w: 'auto',
+          h: 'auto'
+      },
+      pageParam: {
+          name: 'test'
+      },
+      bounces: true,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: true,
+      hScrollBarEnabled: true
+  });
+
+}
+</script>
+</html>

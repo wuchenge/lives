@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>Document</title>
+    <style>
+        .video {
+            position: relative;
+            width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .video_son {
+            width: 48%;
+            padding: 5px;
+        }
+
+        .video_son img {
+            width: 100%;
+            height: 150px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="mui-slider">
+            <div class="mui-slider-group mui-slider-loop" style="height:200px">
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="../../img/4.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/1.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/2.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/3.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/4.jpg" /></a>
+                </div>
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="../../img/1.jpg" /></a>
+                </div>
+            </div>
+            <div class="mui-slider-indicator">
+                <div class="mui-indicator mui-active"></div>
+                <div class="mui-indicator"></div>
+                <div class="mui-indicator"></div>
+                <div class="mui-indicator"></div>
+            </div>
+        </div>
+        <div class="video">
+            <div class="video_son" v-for="todo in lists" onclick="openshiping(this)" :data_id="todo.id" :room_type="todo.room_type"><img :src='`http://zhiboapi.mengwx.com/${todo.img}`' /></div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script>
+    apiready = function() {
+        zhibo_list();
+        xiala();
+        iszbover();
+    };
+    var vuedata = {
+            'lists': []
+        }
+        //console.log(vuedata.lists)
+    var app = new Vue({
+            el: '#app',
+            data: vuedata
+        })
+        // console.log(JSON.stringify( vuedata ))
+        // var aa=$api.getStorage('userinfo');
+        //打开视频win 并传值直播id
+    function openshiping(el) {
+        var data_id = $api.attr(el, 'data_id');
+        var room_type = $api.attr(el, 'room_type');
+        if (room_type == 1) {
+            api.confirm({
+                title: '提示',
+                msg: '当前是免费直播是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id)
+                }
+            });
+        } else if (room_type == 2) {
+            api.prompt({
+                msg: '当前房间是密码房,请输入密码',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                var password = ret.text;
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id, password)
+                }
+            });
+        } else if (room_type == 3) {
+            api.confirm({
+                msg: '当前房间是门票房，是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id, jg)
+                }
+            });
+        } else {
+            api.confirm({
+                msg: '当前房间是计时房，是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id, js_jg)
+                }
+            });
+        }
+    }
+    //进入直播间发请求
+    function jrzb(data_id, password, jg, js_jg) {
+        var uname = $api.getStorage('uname');
+        // console.log(JSON.stringify(uname));
+        // console.log(JSON.stringify(data_id));
+        password = password || '';
+        jg = jg || '';
+        js_jg = js_jg || ''
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/txy/getPlay',
+            method: 'post',
+            headers: km_fasong_tou('/api/txy/getPlay', '', 'admin'),
+            data: {
+                values: {
+                    uname: uname,
+                    zhibo_id: data_id,
+                    password: password,
+                    jg: jg,
+                    js_jg: js_jg
+                }
+            }
+        }, function(ret, err) {
+            console.log(JSON.stringify(ret));
+            if (ret.apizt == 1) {
+                console.log( JSON.stringify( ret) );
+                var bfdz = ret.zhibo_data.bfdz;
+                $api.setStorage('zhibo_data', ret.zhibo_data);//进入直播间获取的直播信息
+                console.log( JSON.stringify( ret.zhibo_data) );
+                $api.setStorage('user_lljl_id', ret.user_lljl_data.id);//该用户进入直播间的信息
+                $api.setStorage('bfdz', bfdz);
+                $api.setStorage('data_id', ret.user_lljl_data.zhibo_id);
+                //console.log(JSON.stringify(bfdz));
+                // api.openFrame({
+                //     name: 'openbf_frm',
+                //     url: './openbf_frm.html',
+                //     rect: {
+                //         x: 0,
+                //         y: 0,
+                //         w: 'auto',
+                //         h: 'auto'
+                //     },
+                //     pageParam: {
+                //         name: 'test'
+                //     },
+                //     bounces: true,
+                //     bgColor: 'rgba(0,0,0,0)',
+                //     vScrollBarEnabled: true,
+                //     hScrollBarEnabled: true
+                // });
+                api.openWin({
+                    name: 'openbf_win',
+                    url: './openbf_win.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            } else {
+              km_toast(ret.msg)
+                console.log(JSON.stringify( err))
+            }
+        });
+    }
+    //获取直播列表
+    function zhibo_list() {
+        var zhibo_type = $api.getStorage('zhibo_type'); //直播类型
+        var arr_nav = [];
+        zhibo_type.map(a => arr_nav.push({
+            id: a.id,
+            name: a.name
+        }));
+        console.log(JSON.stringify( zhibo_type));
+        var type_id = api.pageParam.id;
+        //console.log(type_id);
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/Publics/zhibo_content_list',
+            method: 'post',
+            headers: km_fasong_tou('api/Publics/zhibo_content_list', '', ''),
+            data: {
+                values: {
+                    zhibo_type: type_id
+                }
+            }
+        }, function(ret, err) {
+          //  console.log(JSON.stringify(ret))
+            if (ret.apizt == 1) {
+                var lists = ret.lists;
+                $api.setStorage('lists', lists);
+                //console.log(JSON.stringify(lists));
+                vuedata.lists = $api.getStorage('lists');
+            } else {
+                console.log(JSON.stringify(err))
+            }
+        });
+    }
+    //下拉刷新
+    function xiala() {
+        api.setCustomRefreshHeaderInfo({
+            bgColor: '#C0C0C0',
+        }, function() {
+            var zhibo_type = $api.getStorage('zhibo_type'); //直播类型
+            var arr_nav = [];
+            zhibo_type.map(a => arr_nav.push({
+                id: a.id,
+                name: a.name
+            }));
+            //console.log(JSON.stringify( arr_nav));
+            var type_id = api.pageParam.id;
+            //console.log(type_id);
+            api.ajax({
+                url: km_sis('sis_url_api') + '/api/Publics/zhibo_content_list',
+                method: 'post',
+                headers: km_fasong_tou('api/Publics/zhibo_content_list', '', ''),
+                data: {
+                    values: {
+                        zhibo_type: type_id
+                    }
+                }
+            }, function(ret, err) {
+                console.log(JSON.stringify(ret))
+                if (ret.apizt == 1) {
+                    var lists = ret.lists;
+                    $api.setStorage('lists', lists);
+                    // console.log(JSON.stringify(lists));
+                    vuedata.lists = $api.getStorage('lists');
+                    api.refreshHeaderLoadDone()
+                } else {
+                    console.log(JSON.stringify(err))
+                }
+            });
+        });
+        // api.addEventListener({
+        //     name: 'shake'
+        // }, function(ret, err) {
+        //     api.refreshHeaderLoadDone()
+        // });
+    }
+    //判断主播是否有一场直播未关闭
+    function iszbover(){
+      var uname = $api.getStorage('uname');
+      if(uname!==''){
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/users/is_nobegian',
+            method: 'post',
+            headers: km_fasong_tou('api/users/is_nobegian', '', 'uname'),
+            data: {
+                values: {
+                    uname: uname
+                }
+            }
+        },function(ret, err){
+            if (ret) {
+              if(ret.apizt==1){
+                var zhibo_id=ret.data.id;
+                var uname=ret.data.username;
+                  console.log( JSON.stringify( ret ) );
+                  api.confirm({
+                      title: '提示',
+                      msg: '你还有一场直播未关闭,是否继续',
+                      buttons: ['确定', '关闭']
+                  }, function(ret, err) {
+                      if(ret.buttonIndex==1){
+                        //主播异常继续播放
+                          api.ajax({
+                              url: km_sis('sis_url_api') + '/api/txy/getPush_continue',
+                              method: 'post',
+                              headers: km_fasong_tou('api/txy/getPush_continue', '', 'uname'),
+                              data: {
+                                  values: {
+                                      uname: uname
+                                  }
+                              }
+                          },function(ret, err){
+                              if (ret) {
+                                console.log(JSON.stringify( ret ))
+                                  if(ret.apizt==1){
+                                    api.openWin({
+                                        name: 'zhibo_jiemian_win0',
+                                        url: '../video/zhibo_jiemian_win0.html',
+                                        pageParam: {
+                                            name: 'test'
+                                        }
+                                    });
+                                  }
+                              } else {
+                                  console.log( JSON.stringify( err ) );
+                              }
+                          });
+
+                      }else {
+                        //异常时关闭直播
+                        api.ajax({
+                          url: km_sis('sis_url_api') + '/api/txy/stopPush_other',
+                          method: 'post',
+                          headers: km_fasong_tou('api/txy/stopPush_other', '', 'uname'),
+                          data: {
+                              values: {
+                                  uname: uname,
+                                  zhibo_id:zhibo_id
+                              }
+                          }
+                        },function(ret, err){
+                            if (ret) {
+                              if(ret.apizt==1)
+                                km_toast('成功关闭直播')
+                            } else {
+                                km_toast(ret.msg)
+                            }
+                        });
+                      }
+                  });
+              }
+            } else {
+                console.log( JSON.stringify( err ) );
+            }
+        });
+      }
+    }
+</script>
+
+</html>

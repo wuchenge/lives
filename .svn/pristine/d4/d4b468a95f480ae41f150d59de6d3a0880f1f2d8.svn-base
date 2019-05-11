@@ -1,0 +1,425 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            background-color: #fff;
+        }
+
+        .wrap {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+        }
+
+        header {
+            width: 100%;
+            background: #B2B2B2;
+        }
+    </style>
+</head>
+
+<body class="wrap">
+    <header></header>
+    <footer></footer>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/js.js"></script>
+<script type="text/javascript">
+    var headerH;
+    apiready = function() {
+        var header = $api.dom('header'); // 获取 header 标签元素
+        headerH = $api.fixStatusBar(header);
+        fnNVTabBar_open();
+        fnopenshouye_nvn();
+        setTimeout(fnopenFrameGroup(),5000);
+
+    };
+    //导航页面
+    function fnopenshouye_nvn() {
+        api.openFrame({
+            name: 'nav',
+            url: 'html/shouye/nav.html',
+            bounces: false,
+            rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                marginTop: headerH, // main页面距离win顶部的高度
+                w: 'auto', // main页面的宽度 自适应屏幕宽度
+                h: 42
+            }
+        });
+    }
+    //底部导航
+    function fnNVTabBar_open() {
+        var NVTabBar = api.require('NVTabBar');
+        NVTabBar.open({
+            styles: {
+                bg: 'rgba(200,200,200,1)',
+                h: 54,
+                dividingLine: {
+                    width: 1,
+                    color: '#E2E2E2'
+                },
+                badge: {
+                    bgColor: '#f00',
+                    numColor: '#000',
+                    size: 6.0,
+                    centerY: 2
+                }
+            },
+            items: [{
+                w: api.winWidth / 5.0,
+                iconRect: {
+                    w: 25.0,
+                    h: 25.0,
+                },
+                icon: {
+                    normal: 'widget://image/NVTabBar/acti.png',
+                    highlight: 'widget://image/NVTabBar/actied.png',
+                    selected: 'widget://image/NVTabBar/actied.png'
+                },
+                title: {
+                    text: '首页',
+                    size: 12.0,
+                    normal: '#696969',
+                    selected: '#eb4f38',
+                    marginB: 6.0,
+                }
+            }, {
+                w: api.winWidth / 5.0,
+                iconRect: {
+                    w: 25.0,
+                    h: 25.0,
+                },
+                icon: {
+                    normal: 'widget://image/NVTabBar/bir.png',
+                    highlight: 'widget://image/NVTabBar/bired.png',
+                    selected: 'widget://image/NVTabBar/bired.png'
+                },
+                title: {
+                    text: '关注',
+                    size: 12.0,
+                    normal: '#696969',
+                    selected: '#eb4f38',
+                    marginB: 6.0
+                }
+            }, {
+                w: api.winWidth / 5.0,
+                iconRect: {
+                    w: 25.0,
+                    h: 25.0,
+                },
+                icon: {
+                    normal: 'widget://image/NVTabBar/guan.png',
+                    highlight: 'widget://image/NVTabBar/guaned.png',
+                    selected: 'widget://image/NVTabBar/guaned.png'
+                },
+                title: {
+                    text: '视频',
+                    size: 12.0,
+                    normal: '#696969',
+                    selected: '#eb4f38',
+                    marginB: 6.0
+                }
+            }, {
+                w: api.winWidth / 5.0,
+                iconRect: {
+                    w: 25.0,
+                    h: 25.0,
+                },
+                icon: {
+                    normal: 'widget://image/NVTabBar/bir.png',
+                    highlight: 'widget://image/NVTabBar/bired.png',
+                    selected: 'widget://image/NVTabBar/bired.png'
+                },
+                title: {
+                    text: '消息',
+                    size: 12.0,
+                    normal: '#696969',
+                    selected: '#eb4f38',
+                    marginB: 6.0
+                }
+            }, {
+                w: api.winWidth / 5.0,
+                iconRect: {
+                    w: 25.0,
+                    h: 25.0,
+                },
+                icon: {
+                    normal: 'widget://image/NVTabBar/fav.png',
+                    highlight: 'widget://image/NVTabBar/faved.png',
+                    selected: 'widget://image/NVTabBar/faved.png'
+                },
+                title: {
+                    text: '我的',
+                    size: 12.0,
+                    normal: '#696969',
+                    selected: '#eb4f38',
+                    marginB: 6.0
+                }
+            }],
+            selectedIndex: 0
+        }, function(ret, err) {
+            if (ret) {
+                if (ret.eventType == "click" && ret.index == 0) {
+                    fnHidexiaoxiFrame();
+                    fnHideguanzhuFrme();
+                    fnHideMyinfoFrame();
+                    fnopenFrameGroup();
+                    fnHidevideoFrame();
+                }
+                if (ret.eventType == "click" && ret.index == 1) {
+                    if (!km_islogin_app()) { //未登录
+                        NVTabBar.setSelect({
+                            index: 0,
+                            selected: true,
+                        });
+                        login()
+                    } else {
+                        fnopenguanzhuFrame();
+                    }
+                }
+                if (ret.eventType == "click" && ret.index == 2) {
+                    if (!km_islogin_app()) { //未登录
+                      qiehuanclass()
+                        login()
+                    } else {
+                        opnevideo();
+                    }
+                }
+                if (ret.eventType == "click" && ret.index == 3) {
+                    if (!km_islogin_app()) { //未登录
+                      qiehuanclass()
+                        login()
+                    } else {
+                        fnOpenxiaoxiFrame();
+                    }
+                }
+                if (ret.eventType == "click" && ret.index == 4) {
+                    if (!km_islogin_app()) { //未登录
+                      qiehuanclass()
+                        login()
+                    } else {
+                        fnOpenMyinfoFrame();
+                    }
+                }
+            }
+        });
+    }
+    //登录之后切换底部class
+    function qiehuanclass(){
+        var NVTabBar = api.require('NVTabBar');
+        NVTabBar.setSelect({
+            index: 0,
+            selected: true,
+        });
+    }
+    //登录界面
+    function login() {
+        api.openFrame({
+            name: 'login_frm',
+            url: 'html/wode/login_frm.html',
+            bgColor: 'rgba(0,0,0,0.5)',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+    }
+    //首页顶部导航
+    function fnopenFrameGroup() {
+      api.ajax({
+          url: km_sis('sis_url_api') +'/api/Publics/menu_list',
+          method: 'post',
+          headers: km_fasong_tou('api/Publics/menu_list', '', ''),
+          data: {
+              values: {
+
+              }
+          }
+      },function(ret, err){
+          if (ret) {
+            if(ret.apizt==1)
+              $api.setStorage('zhibo_type', ret.lists);
+              var zhibo_type=  ret.lists; //直播类型
+              console.log(JSON.stringify( zhibo_type));
+              var arr_nav = [];
+              zhibo_type.map(a => arr_nav.push({id:a.id,name:a.name}));
+              console.log(JSON.stringify( arr_nav));
+              var frames=[];
+              for (var i = 0; i < arr_nav.length; i++) {
+                    frames.push({
+                      name: 'leimu'+i,
+                      url: 'html/shouye/tuijian.html',
+                      pageParam: {
+                          id: arr_nav[i].id
+                      },
+                      bounces: true,
+                      customRefreshHeader: 'UIPullRefreshDrop'
+                    })
+              }
+              // console.log(JSON.stringify( frames));
+                api.openFrameGroup({
+                    name: 'group',
+                    rect: {
+                        x: 0,
+                        y: headerH + 42,
+                        w: 'auto',
+                        marginBottom: 54
+                    },
+                    scrollEnabled: true,
+                    preload:0,
+                    frames:frames
+                }, function(ret, err) {
+                    if (ret) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret.index > -1) {
+                            api.execScript({
+                                frameName: 'nav',
+                                script: 'fnNvnsetSelected("' + ret.index + '");'
+                            });
+                        }
+                    } else {
+                        conosle.log(JSON.stringify(err));
+                    }
+                });
+          } else {
+              conosle.log( JSON.stringify( err ) );
+          }
+      });
+    }
+    //关注
+    function fnopenguanzhuFrame() {
+        api.openFrame({
+            name: 'guanzhu_frm',
+            url: 'html/guanzhu/guanzhu_frm.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                marginBottom: 54
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+    }
+    //视频
+    function opnevideo() {
+        api.openFrame({
+            name: 'zhibo_frm',
+            url: 'html/video/zhibo_frm.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                marginBottom: 54
+            },
+            pageParam: {
+                name: 'test'
+            },
+            reload:true,
+            bounces: false,
+            bgColor: 'rgba(255,255,255)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+    }
+    //消息
+    function fnOpenxiaoxiFrame() {
+        api.openFrame({
+            name: 'xiaoxi_frm',
+            url: 'html/xiaoxi/xiaoxi_frm.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                marginBottom: 54
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+    }
+    //我的信息
+    function fnOpenMyinfoFrame() {
+        api.openFrame({
+            name: 'personal_center_frm',
+            url: 'html/wode/personal_center_frm.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                marginBottom: 54
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+    }
+    //当前frmgroup显示的frm
+    function fnsetFrameGroupIndex(name, index) {
+        api.setFrameGroupIndex({
+            name: name,
+            index: index,
+            scroll: true
+        });
+    }
+    //关注
+    function fnHideguanzhuFrme() {
+        api.setFrameAttr({
+            name: 'guanzhu_frm',
+            hidden: true
+        });
+    }
+    //消息
+    function fnHidexiaoxiFrame() {
+        api.setFrameAttr({
+            name: 'xiaoxi_frm',
+            hidden: true
+        });
+    }
+    //视屏
+    function fnHidevideoFrame() {
+        api.setFrameAttr({
+            name: 'zhibo_frm',
+            hidden: true
+        });
+    }
+    //我的
+    function fnHideMyinfoFrame() {
+        api.setFrameAttr({
+            name: 'personal_center_frm',
+            hidden: true
+        });
+    }
+</script>
+
+</html>

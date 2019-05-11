@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>转帐记录</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+
+</style>
+<body>
+		<header class="mui-bar mui-bar-nav" style="height:62px">
+			<a tapmode onclick="closerolloutfrm_record_win()" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">转帐记录</h1>
+		</header>
+		<footer></footer>
+</body>
+<script type="text/javascript" src="../../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script type="text/javascript">
+apiready = function () {
+		km_apiready('win');
+		openrolloutfrm_record_frm();
+}
+
+function openrolloutfrm_record_frm(){
+	api.openFrame({
+	    name: 'rolloutfrm_record_frm',
+	    url: 'rolloutfrm_record_frm.html',
+	    rect: {
+	        x: 0,
+	        y: $api.offset($api.dom('header')).h,
+	        w: 'auto',
+	        h: 'auto'
+	    },
+	    pageParam: {
+	        name: 'test'
+	    },
+	    bgColor: 'rgba(0,0,0,0)',
+			bounces:true,
+	    vScrollBarEnabled: true,
+	    hScrollBarEnabled: true
+	});
+}
+function closerolloutfrm_record_win(){
+	api.closeWin({
+	    name: 'rolloutfrm_record_win'
+	});
+}
+</script>
+</html>

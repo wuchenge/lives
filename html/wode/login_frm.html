@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css"/>
+  	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css"/>
+  <style>
+    body,html{
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+          .zhezhao{
+            position: fixed;
+            width: 100%;
+            height:800px;
+            top:0;
+            left: 0;
+            background:rgba(0,0,0,.1);
+            z-index: 200;
+          }
+          .neirou{
+            position:fixed;
+            display: flex;
+            width: 80%;
+            height: 280px;
+            top:150px;
+            left:10%;
+            background: #fff;
+            border-radius: 10px;
+            z-index: 1000;
+          }
+          .tuichu{
+              position: fixed;
+              width: 10%;
+              height:  40px;
+              top:430px;
+              left:45%;
+              color: #fff;
+              z-index: 1000;
+              text-align: center;
+              font-size: 25px;
+          }
+          .mui-input-group{
+            position: relative;
+            width: 100%;
+            border-radius: 10px;
+          }
+          .input_yanzheng{
+            position: relative;
+            display: flex;
+            width: 100%;
+          }
+          .input_yanzheng .input_yanzheng1{
+            width:60%;
+            height:50px;
+          }
+          .tijiao{
+            display: block;
+            width: 40%;
+            height: 35px;
+            margin-top: 20px;
+            border-radius: 15px;
+          }
+          .login_header{
+            width: 100%;
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            font-size: 20px
+          }
+          .mui-input-group:after{
+            height: 0
+          }
+          .mui-input-group:before{
+            height: 0
+          }
+          .footer_button{
+            position: relative;
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            margin: 0 auto;
+          }
+    </style>
+</head>
+<body>
+
+    <div class='zhezhao' id="zhezhao"></div>
+    <div class='neirou'>
+      <form class="mui-input-group">
+          <div class="login_header">登录</div>
+        <div class="mui-input-row">
+            <label>账号</label>
+            <input type="text" class="mui-input-clear uname" placeholder="请输入账号" value="qqqqqq">
+        </div>
+        <div class="mui-input-row input_yanzheng">
+          <label>密码</label>
+						<input type="text" class="mui-input-clear pwd" placeholder="请输入密码" value="111111">
+				</div>
+        <div class="footer_button">
+            <button type="button" class="mui-btn mui-btn-royal tijiao"  onclick="register()">注册</button>
+            <button type="button" class="mui-btn mui-btn-royal tijiao"  onclick="login()">登录</button>
+        </div>
+      </form>
+    </div>
+    <div class="tuichu" onclick="closeFrame_login()">X</div>
+
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+  apiready = function() {
+
+  };
+  function closeFrame_login(){
+    api.closeFrame({
+        name: 'login_frm'
+    });
+  }
+  //关闭注册窗口带过来的uname
+  function setuname(uname){
+    var uname=$api.val($api.dom('.uname'),uname);
+  }
+
+  //登录
+  function login(){
+    var uname=$api.val($api.dom('.uname'));
+    var pwd=$api.val($api.dom('.pwd'));
+    var reg = /^[0-9a-zA-Z]*$/g;//正则表达式，必须是数字或者字母
+    // console.log(JSON.stringify(reg.test(uname) ));
+    // console.log(JSON.stringify(reg.test(pwd) ));
+    if(uname != ""&&pwd != ""&&!reg.test(uname)){
+      km_toast("账号必须字母或者数字");
+      return
+    }
+    if(uname != ""&&pwd != ""&&reg.test(pwd)){
+      km_toast("密码必须字母或者数字");
+      return
+    }
+    // console.log(JSON.stringify(!reg.test(uname) ));
+    // console.log(JSON.stringify(!reg.test(pwd) ));
+    if(uname==""||pwd==""){
+      km_toast("账号密码不能为空");
+      return
+    }
+    if(uname.length<6||pwd.length<6||reg.length<6){
+      km_toast("账号密码必须大于等于6位");
+      return
+    }
+    // console.log(JSON.stringify( km_fasong_tou('api/publics/login', '', uname) ));
+    // console.log(typeof(uname))
+      api.ajax({
+          url: km_sis('sis_url_api') +'/api/publics/login',
+          method: 'post',
+          headers: km_fasong_tou('api/publics/login', '', uname),
+          data: {
+              values: {
+                  uname: uname,
+                  pwd: pwd
+              }
+          }
+      },function(ret, err){
+          if (ret) {
+            //console.log(JSON.stringify( ret ));
+            if(ret.apizt==1){
+              console.log(JSON.stringify( ret.userinfo.sqzb_state ));
+              km_toast('登录成功');
+              $api.setStorage('uname', uname); //用户名
+              $api.setStorage('pwd', pwd); //用户密码不可逆加密后的字段
+              km_userinfo(ret.userinfo); //修改缓存用户信息并广播（如果本页用了km_apiready()，自动有监听修改vuedata）
+              $api.setStorage('setting', ret.setting); //系统基本参数
+              $api.setStorage('sessionid', ret.sessionid); //本次登录会话ID
+              // console.log(JSON.stringify( ret.setting ));
+              closeFrame_login();
+
+            }else{
+              km_toast(ret.msg);
+            }
+          } else {
+
+            console.log(JSON.stringify( err ));
+          }
+      });
+    }
+  //注册
+  function register(){
+    api.openWin({
+        name: 'registerwin',
+        url: './registerwin.html',
+        pageParam: {
+            name: 'test'
+        }
+    });
+
+  }
+</script>
+</html>

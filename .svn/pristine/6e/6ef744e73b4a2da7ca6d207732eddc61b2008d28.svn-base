@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>直播首页界面</title>
+    <style>
+        #app {
+            position: relative;
+            width: 90%;
+            height: 350px;
+            margin: 0 auto;
+        }
+
+        .biaoti_fa {
+            position: relative;
+            margin: 35px auto;
+            padding: 30px;
+        }
+
+        .biaoti_fa div {
+            height: 30px;
+            width: 100%;
+            border-bottom: 1px solid #c1aeae;
+            line-height: 30px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .biaoti_fa input {
+            background-color: rgba(0, 0, 0, 0.01);
+            height: 35px;
+            width: 100%;
+            margin: 0 auto;
+            outline: none;
+            border-style: none;
+            border-bottom: 1px solid #c1aeae;
+        }
+
+        .btn {
+            position: relative;
+            width: 80%;
+            height: 35px;
+            margin: 0 auto;
+        }
+
+        .btn button {
+            width: 100%;
+            height: 35px;
+            background-color: #e31ce6;
+            border-style: none;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 18px;
+            outline: none;
+            margin: 10px
+        }
+
+        .type_father {
+            position: relative;
+            width: 80%;
+            height: 150px;
+            margin: 0 auto;
+            line-height: 30px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .typeTwo input {
+            border: none;
+            outline: none;
+            border-bottom: 1px solid gray;
+            padding: 0 10px 0 10px;
+            width: 50px;
+        }
+
+        input {
+            outline: none;
+        }
+
+        select {
+            outline: none;
+            width: 60%;
+        }
+
+        .zhibi_type span {
+            font-size: 15px;
+        }
+
+        .zhibi_type {
+            position: relative;
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .type_father span {
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='app'>
+        <div class="biaoti_fa">
+            <div>给直播写个标题吧，可能会有很多人看哦</div>
+            <input type="text" id="zb_title">
+        </div>
+        <div class="zhibi_type">
+            <span>直播类型:</span>
+            <select name="" v-model="type">
+            <option :value="list.id" v-for="list in home_type">{{list.title}}</option>
+          </select>
+        </div>
+        <div class="type_father">
+            <span>房间类型:</span>
+            <select name="" v-model="types">
+    		  		<option :value="item.id" v-for="item in selectLIst">{{item.title}}</option>
+    		  	</select>
+            <div class="password" v-if="types == 2">
+                <input type="text" placeholder="请输入密码" v-model="password" />
+            </div>
+            <div class="typeTwo" v-else-if="types == 3">
+                免费观看<input type="number" v-model="time1" />分钟,门票是<input type="number" v-model="money1" />
+            </div>
+            <div class="typeTwo" v-else-if="types == 4">
+                免费观看<input type="number" v-model="time2" />分钟，每分钟<input type="text" v-model="money2" />钻石
+            </div>
+        </div>
+        <div class="btn">
+            <button type="button" name="button" tapmode @click="gets">开始直播</button>
+            <button type="button" name="button" tapmode onclick="overzhibo()">结束直播</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script type="text/javascript">
+    apiready = function() {};
+    var zhibo_type = $api.getStorage('zhibo_type');
+     console.log(JSON.stringify(zhibo_type));
+    var home_type = [];
+    zhibo_type.forEach(function(v) {
+        home_type.push({
+            id: v.id,
+            title: v.name
+        })
+    });
+    //console.log(JSON.stringify(home_type ));
+    var vuedata = {
+        selectLIst: [{
+            id: 1,
+            title: '普通房间'
+        }, {
+            id: 2,
+            title: '密码房间'
+        }, {
+            id: 3,
+            title: '门票房间'
+        }, {
+            id: 4,
+            title: '计时房间'
+        }, ],
+        types: 1,
+        home_type: home_type,
+        type: 1,
+        password: '', //密码
+        time1: 0, //分钟
+        money1: '', //门票
+        time2: 0, //分钟2
+        money2: '', //钻石
+    };
+    //console.log(JSON.stringify(vuedata ));
+    var app = new Vue({
+        el: '#app',
+        data: vuedata,
+        methods: {
+            gets() {
+                var data = {
+                        types: this.types, //房间类型
+                        type: this.type, //直播类型
+                        password: this.password,
+                        time1: this.time1,
+                        money1: this.money1,
+                        time2: this.time2,
+                        money2: this.money2
+                    }
+                    //console.log(JSON.stringify(data))
+                var uname = $api.getStorage('uname'); //获取用户名
+                kaizhibo(uname, data.types, data.type, data.password, data.time1, data.money1, data.time2, data.money2);
+            }
+        }
+    })
+
+
+
+    //开启直播
+    function kaizhibo(uname, types, type, password, time1, money1, time2, money2) {
+
+        // var uname=$api.getStorage('uname'); //获取用户名
+        var zb_title = $api.val($api.dom('#zb_title'));
+        //console.log(zb_title)
+        if (time1 == "") {
+            time = time2
+        } else {
+            time = time1
+        }
+        console.log(JSON.stringify(time))
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/txy/getPush',
+            method: 'post',
+            headers: km_fasong_tou('api/txy/getPush', '', 'admin'),
+            data: {
+                values: {
+                    name: zb_title,
+                    uname: uname,
+                    zhibo_type: type,
+                    room_type: types,
+                    password: password,
+                    free_time: time,
+                    jg: money1,
+                    dwtime_zs: money2
+                        // get_type:2
+                }
+            }
+        }, function(ret, err) {
+            console.log(JSON.stringify(ret))
+            if (ret.apizt == 1) {
+                $api.setStorage('data', ret.data);
+                api.openWin({
+                    name: 'zhibo_jiemian_win0',
+                    url: './zhibo_jiemian_win0.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+
+            } else {
+                km_toast(ret.msg)
+            }
+        });
+    }
+    //关闭直播
+    function overzhibo() {
+        var uname = $api.getStorage('uname'); //获取用户名
+        var id = $api.getStorage('data').id; //获取直播id
+        // alert(id);
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/txy/stopPush',
+            method: 'post',
+            headers: km_fasong_tou('api/txy/stopPush', '', 'admin'),
+            data: {
+                values: {
+                    uname: uname,
+                    zhibo_id: id
+                }
+            }
+        }, function(ret, err) {
+            console.log(JSON.stringify(ret));
+            if (ret.apizt == 1) {
+                var txLive = api.require('txLive');
+                txLive.stopPush();
+                $api.setStorage('data_user', ret.data_user);
+                // console.log(JSON.stringify( ret.data_user ));
+                $api.setStorage('data_zhibo', ret.data_zhibo);
+                //console.log(JSON.stringify( ret.data_zhibo.sc));
+            } else {
+                console.log(JSON.stringify(err));
+            }
+        });
+
+    }
+</script>
+
+</html>

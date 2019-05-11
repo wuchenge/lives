@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/aui/css/aui.css" />
+    <title>直播界面</title>
+    <style>
+        body,
+        html {
+            background: transparent !important;
+            background: red;
+        }
+
+        header {
+            height: 60px;
+            border: 1px solod red;
+        }
+
+        .guanbi {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            right: 20px;
+            top: 50px;
+            line-height: 30px;
+            color: #fff;
+            text-align: center;
+            background: blue;
+        }
+        .footer_fs{
+          position: absolute;
+          visibility: hidden;
+          width: 100%;
+          height: 40px;
+          bottom: 0;
+          background: #fff;
+          display: flex;
+          justify-content: space-between;
+          align-items:center;
+          z-index: 300;
+        }
+        .footer_fs .fa_neirou{
+          background: rgb(200, 200, 200);
+          width: 70%;
+          height: 30px;
+          border-radius: 5px;
+          color: #000;
+          padding: 0 16px;
+        }
+        .footer_fs div{
+          width: 25%;
+          height: 30px;
+          border-radius: 5px;
+          background: rgb(200, 200, 200);
+        }
+        .ui_footer{
+          position: absolute;
+          width: 100%;
+          height: 40px;
+          bottom: 0;
+          display: flex;
+          justify-content: space-between;
+          align-items:center;
+        }
+        .renovate{
+          width: 80px;
+          height: 40px;
+          line-height: 40px;
+          color: #fff;
+          text-align: center;
+        }
+        .shade{
+            position: fixed;
+            width: 100%;
+            height:800px;
+            visibility: hidden;
+            top:0;
+            left: 0;
+            background:rgba(0,0,0,0.5);
+            z-index: 200;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id='app'>
+        <div class="shade" tapmode onclick="hidden_input()"></div>
+        <div class="guanbi" tapmode onclick="closezb1()">X</div>
+        <div class="ui_footer">
+          <div class="renovate" tapmode onclick="openinput()"><i class="aui-iconfont aui-icon-edit"></i></div>
+          <div class="renovate" tapmode onclick="renovate()"><i class="aui-iconfont aui-icon-refresh"></i></div>
+          <div class="renovate" tapmode onclick="openlw()"><i class="aui-iconfont aui-icon-edit"></i></div>
+        </div>
+        <div class="footer_fs">
+          <input id="text" type="text" class="fa_neirou" >
+          <div class="aui-btn" tapmode onclick="send()">发送</div>
+        </div>
+    </div>
+    <footer></footer>
+</body>
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../res/aui/js/aui_dialog.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../res/jquery/jquery_1_8_2_min.js"></script>
+<script type="text/javascript">
+var rong;    //设置全局变量接收融云
+var demo;
+apiready = function() {
+  //融云方法开始
+  rong = api.require('rongCloud2');
+  demo = api.require('liveUI');
+  rongInit();    //初始化
+  //结束
+  openzbui();
+  km_apiready('frm');
+};
+//-------------------------------songyanlongcode------------------------------------
+var username = $api.getStorage('uname');
+//初始化融云
+function rongInit() {
+  rong.init(function(ret, err) {
+    if(ret.status == 'success') {
+      setOnReceiveMessageListener();
+      userGetToken();
+    }
+    if (ret.status == 'error')
+    api.toast({ msg: err.code });
+  });
+}
+//获取token
+function userGetToken() {
+  api.ajax({
+      url: km_sis('sis_url_api') +'/api/biliao.index/base',
+      method: 'post',
+      headers: km_fasong_tou('/api/biliao.index/base', '', username),
+      data: {
+          values: {
+            uname: username,
+          },
+      }
+  }, function(ret, err) {
+      if (ret) {
+        //console.log(ret.biliao.token);
+        rongConnect(ret.biliao.token);
+      } else {
+        console.log(JSON.stringify(err))
+      }
+  })
+}
+//链接融云服务器
+function rongConnect(gettoken) {
+    rong.connect({
+        token: gettoken },function(ret, err) {
+          //console.log(JSON.stringify(ret));
+        if (ret.status == 'success') {
+          var zhiboId = $api.getStorage('data').id;
+          //alert(zhiboId);
+          joinRoom(zhiboId);
+        } else {
+          //console.log(JSON.stringify(err));
+        }
+    });
+}
+//创建/加入聊天室
+function joinRoom(roomId) {
+  var roomNewId = toString(roomId)
+  rong.joinChatRoom({
+      chatRoomId: roomNewId,
+      defMessageCount: 20
+  }, function(ret, err) {
+      if (ret.status == 'success') {
+        // var msg = username + "进入了聊天室"
+        // sendRoomTextMessage(msg,roomId); //提示用户进入了聊天室
+      } else {
+          //console.log(err.code);
+      }
+  })
+}
+//消息监听
+function setOnReceiveMessageListener() {
+    rong.setOnReceiveMessageListener(function(ret, err) {
+        if (ret && ret.result) {
+          var othersArray = JSON.parse(ret.result.message.content.extra);      //字符串转换成数组
+          var otherName = othersArray.nickname;        //获取发送消息的用户名
+          var othertext = ret.result.message.content.text;  //获取用户发的消息
+          var otheruid = othersArray.customer_id;
+          var userId = $api.getStorage('userinfo').id;
+          var param = {
+              uid : otheruid,//用户id
+              startnum : 1,  //等级
+              nickname : otherName,//用户名称
+              nicknameColor : "#BA55D3",//用户名称字体颜色
+              message : othertext,//消息
+              messageColor : "#DDA0DD"//消息字体颜色
+          };
+          demo.showMessage(param, function(ret, err) {
+              //api.toast({msg : JSON.stringify(ret)+"  "+JSON.stringify(err)});
+          });
+        }
+    })
+}
+//发送消息
+function send() {
+  var text = $api.byId('text').value;
+  var zhiboId = $api.getStorage('data').id;
+  sendRoomTextMessage(text,zhiboId);
+}
+//发送消息
+function sendRoomTextMessage(msg,room_id) {
+    var roomIdd = toString(room_id)
+    var message = msg;  //用户发送的消息
+    var username = $api.getStorage('uname');  //用户昵称
+    var userId = $api.getStorage('userinfo').id;
+    var other = {
+      nickname:username,
+      headimgurl:"",
+      customer_id:userId
+    }
+    var others = JSON.stringify(other);
+    rong.sendTextMessage({
+        conversationType: 'CHATROOM', // PRIVATE 单聊，DISCUSSION 讨论组，GROUP 群组，CHATROOM 聊天室，SYSTEM 系统，CUSTOMER_SERVICE 客服
+        targetId: roomIdd,
+        text: message,
+        extra: others
+    }, function(ret, err) {
+        if(ret.status == "success") {                  //用户发送消息后有prepare准备状态和success成功状态
+          var userId = $api.getStorage('userinfo').id;
+          var param = {
+              uid : userId,//用户id
+              startnum : 1,  //等级
+              nickname : username,//用户名称
+              nicknameColor : "#BA55D3",//用户名称字体颜色
+              message : message,//消息
+              messageColor : "#DDA0DD"//消息字体颜色
+          };
+          demo.showMessage(param, function(ret, err) {
+              //api.toast({msg : JSON.stringify(ret)+"  "+JSON.stringify(err)});
+          });
+          $api.byId('text').value = "";                //清空input的值
+          hidden_input()
+        }
+
+    });
+}
+//-------------------------------wumengcode-----------------------------------------
+    //礼物显示
+    function openlw(){
+      api.openFrame({
+          name: 'live_lw_frm',
+          url: './live_lw_frm.html',
+          rect: {
+              x: 0,
+              y: 0,
+              w: 'auto',
+              h: 'auto'
+          },
+          pageParam: {
+              name: 'test'
+          },
+          bgColor: 'rgba(0,0,0,0)',
+          vScrollBarEnabled: true,
+          hScrollBarEnabled: true
+      });
+
+    }
+    // function openlw(){
+    //   var shade=$api.dom('.shade');
+    //   shade.style.visibility='visible';
+    //   var footer_lw=$api.dom('.footer_lw');
+    //   footer_lw.style.visibility='visible';
+    // }
+    //输入显示
+    function openinput(){
+      var shade=$api.dom('.shade');
+      shade.style.visibility='visible';
+      var div_input=$api.dom('.footer_fs');
+      div_input.style.visibility='visible';
+    }
+    //输入隐藏
+    function hidden_input(){
+      var shade=$api.dom('.shade');
+      shade.style.visibility='hidden';
+      var div_input=$api.dom('.footer_fs');
+      div_input.style.visibility='hidden';
+    }
+    //刷新
+    function renovate(){
+      api.execScript({
+          name: 'live_page_win',
+          script: 'refurbish()'
+      });
+    }
+    //模拟用户发送消息
+    function fs_barrage(){
+      var shade=$api.dom('.shade');
+      shade.style.visibility='hidden';
+      var div_input=$api.dom('.footer_fs');
+      div_input.style.visibility='hidden';
+      var fa_neirou=$api.val($api.dom('.fa_neirou'))
+      console.log(JSON.stringify( fa_neirou ));
+      var demo = api.require('liveUI');
+      var param = {
+          uid : new Date().getTime(),//用户id
+          startnum : 1,  //等级
+          nickname : "小气鬼"+new Date().getTime(),//用户名称
+          nicknameColor : "#BA55D3",//用户名称字体颜色
+          message : fa_neirou,//消息
+          messageColor : "#DDA0DD",//消息字体颜色
+          fixedOn:'live_page_frm'
+      };
+      //消息列表显示
+      demo.showMessage(param, function(ret, err) {
+          if(ret){
+            $api.val($api.dom('.fa_neirou'),"")
+          }
+      });
+      //弹幕显示
+      demo.showDanmu(param, function(ret, err) {
+          api.toast({msg : JSON.stringify(ret)+"  "+JSON.stringify(err)});
+      });
+    }
+    //直播ui
+    function openzbui() {
+        var data = $api.getStorage('data');
+        console.log(JSON.stringify(data));
+        var userList = new Array();
+        var msgList = new Array();
+        var demo = api.require('liveUI');
+        for (var i = 0; i < 5; i++) {
+            var data1 = {
+                uid: i, //用户id
+                nickname: "小气鬼" + new Date().getTime(), //用户名称
+                headpic: "widget://image/mac.png", //用户头像
+                starpic: "widget://image/icon_live_toolbar_send_star.png" //等级图标
+            };
+            userList.push(data1);
+        }
+
+        var param = {
+            roomName: data.zhibo_name, //房间名称
+            uid: data.userid, //用户id
+            name: data.nicename, //用户名称或者直播名称
+            headpic: `http://zhiboapi.mengwx.com/${data.headimg}`, //用户头像或者直播房间头像
+            starpic: "widget://image/icon_live_toolbar_send_star.png", //等级图标
+            isDanmu: true, //是否开启弹幕
+            isShowGuanZhuBtn: false, //是否显示关注按钮
+            memberCounts: data.line_rs, //观看人数
+            userList: userList,
+            messageList: msgList,
+            fixedOn: api.frameName,
+            fixed: true
+        };
+        demo.openLiveUI(param, function(ret, err) {
+          if(ret.eventType=='onClickGuanZhu'){
+              alert("你点击了关注");
+          }else if (ret.eventType=='onClickHeadIcon') {
+              alert("你点击了主播头像");
+          }else if (ret.eventType=='onClickUserList') {
+              alert("点击观众列表某用户头像");
+          }else if (ret.eventType=='onClickMessage') {
+              alert("点击消息列表某条消息");
+          }
+        });
+    }
+
+</script>
+
+</html>

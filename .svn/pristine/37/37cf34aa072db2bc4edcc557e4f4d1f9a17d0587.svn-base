@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
+    <item name="appkey" value="81A2F5E7-28AA-278C-D766-AA05FC535187"/>
+    <item name="widgetid" value="A6000831611081"/>
+    <!-- APP主服务器 -->
+    <item name="sis_url_api" value="http://zhiboapi.mengwx.com"/>
+    <!-- 图片服务器 -->
+    <item name="sis_url_img" value="http://zhiboapi.mengwx.com"/>
+</security>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>直播依靠的win</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        openzhibo_jiemian_frm();
+        api.addEventListener({
+          name: 'keyback'
+        }, function(ret, err) {
+            closezb1()
+        });
+    };
+    function openzhibo_jiemian_frm(){
+      var data = $api.getStorage('data');
+      console.log(data.id)
+      var txLive = api.require('txLive');
+      txLive.openPusher({
+          x: 0,
+          y: 0,
+          h: api.winHeight,
+          w: api.winWidth,
+          fixed: false,
+          url: data.tldz //填写腾讯云平台上生成的推流地址
+      });
+      txLive.startPush();
+      api.openFrame({
+          name: 'zhibo_jiemian_frm',
+          url: './zhibo_jiemian_frm.html',
+          rect: {
+              x: 0,
+              y: 20,
+              w: 'auto',
+              h: 'auto'
+          },
+          pageParam: {
+              name: 'test'
+          },
+          bgColor: 'rgba(0,0,0,0.01)',
+          vScrollBarEnabled: true,
+          hScrollBarEnabled: true
+      });
+    }
+</script>
+
+</html>

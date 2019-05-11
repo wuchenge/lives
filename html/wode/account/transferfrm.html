@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>转账</title>
+  <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css" />
+</head>
+<style>
+    body,html{
+      background:transparent !important;
+    }
+    .zhezhao {
+        position: fixed;
+        width: 100%;
+        height: 800px;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+    }
+    .box_father{
+      position: fixed;
+      width: 100%;
+      height: 500px;
+      z-index: 1000;
+    }
+    .box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 80%;
+        height: 125px;
+        margin: auto;
+        z-index: 1000;
+    }
+    .mui-btn-primary{
+      margin-right: 80px;
+    }
+    .mui-input-group:after{
+      height: 0
+    }
+    .mui-input-group:before{
+      height: 0
+    }
+    .mui-input-group{
+      border-radius: 5px;
+    }
+    input::-webkit-input-placeholder{
+      font-size: 12px
+    }
+    .mui-input-row .mui-input-clear,.mui-input-row .mui-input-password{
+      width: 60%;
+    }
+    .mui-input-row label{
+      width: 40%;
+    }
+</style>
+<body>
+    <div class="zhezhao"></div>
+    <div class="box_father">
+      <div class="box">
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>银行卡号：</label>
+                <input type="text" class="mui-input-clear" placeholder="请输入对方账号" v-model='val1' >
+            </div>
+            <div class="mui-input-row">
+                <label>支付密码：</label>
+                <input type="password" class="mui-input-password" placeholder="请输入密码"v-model='val2'>
+            </div>
+            <div class="mui-input-row">
+                <label>金额：</label>
+                <input type="number" class="mui-input-clear" placeholder="请输入金额" v-model='val3' pattern="[0-9]*">
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" tapmode @click="recharge()">确认</button>
+                <button type="button" class="mui-btn mui-btn-danger" tapmode onclick="closefrarecharge()">取消</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+</body>
+<script type="text/javascript" src="../../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script src="../../../script/vue_min.js"></script>
+<script type="text/javascript">
+apiready = function () {
+}
+
+	var app = new Vue({
+	  el: '.mui-input-group',
+    data: {
+      val1: '3f87yAlsNPIzsfOMmKuwvOsMvehD9Q3wXNoNiUMX',
+      val2: '111111',
+      val3: ''
+    },
+	  methods: {
+      //充值
+      recharge: function () {
+          var userinfo =$api.getStorage('userinfo');
+          var uid=userinfo.id;
+          var target_uid= this.val1;
+          var zfmm= this.val2;
+          var num= this.val3;
+          console.log()
+           api.ajax({
+             url: km_sis('sis_url_api') +'/api/caiwu/zhuanzhan_do',
+             method: 'post',
+             headers: km_fasong_tou('api/caiwu/zhuanzhan_do', '', ''),
+             data: {
+                 values: {
+                     uid: uid,
+                     target_uid:target_uid,
+                     zfmm:zfmm,
+                     num:num
+                 }
+             }
+           },function(ret, err){
+               if (ret) {
+                // console.log( JSON.stringify( ret ) );
+                 if(ret.apizt==1){
+                  //  console.log( JSON.stringify( ret.data ) );
+                    $api.setStorage('userinfo', ret.data); //更新用户信息
+                    var userinfo=$api.getStorage('userinfo');
+                    console.log(userinfo.yhye)
+                    api.sendEvent({
+                      name: 'userinfo',
+                      extra: {
+                        userinfo
+                        }
+                    });
+                    km_toast('充值成功');
+                    api.closeFrame({
+                        name: 'transferfrm'
+                    });
+                 }else{
+                   alert(ret.msg)
+                 }
+               } else {
+                  console.log( JSON.stringify( err ) );
+               }
+           });
+      }
+    }
+	})
+
+
+//取消
+function closefrarecharge(){
+  api.closeFrame({
+      name: 'transferfrm'
+  });
+}
+</script>
+</html>

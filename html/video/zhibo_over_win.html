@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>直播结束界面</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<style>
+	body,
+	html {
+		background-color: #504747;
+	}
+
+	.main {
+		position: relative;
+		width: 90%;
+		margin: 60px auto;
+		text-align: center;
+	}
+
+	.main .title {
+		position: relative;
+		/*width: 50px;
+		height: 50px;
+*/
+	}
+
+	.main .title img {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+	}
+
+	.main .grdata h1 {
+		color: #fff;
+		font-size: 20px;
+	}
+
+	.main .grdata span {
+		margin: 10px;
+		font-size: 14px;
+		color: #fff;
+	}
+
+	.main .zbtime {
+		position: relative;
+		margin-top: 20px;
+		width: 100%;
+		border-top: 1px solid #A2A6B2;
+		border-bottom: 1px solid #A2A6B2;
+	}
+
+	.main .zbtime h1 {
+		color: #fff;
+		font-size: 20px;
+	}
+
+	.main .zb_earnings {
+		position: relative;
+		width: 100%;
+		display: flex;
+	}
+
+	.zb_earnings .earnings {
+		flex: 1;
+		color: #fff;
+		font-size: 20px;
+	}
+	.footer_wenzi{
+		position: relative;
+		width: 100%;
+		height: 40px;
+		margin: 20px auto;
+		color: #fff;
+		line-height: 40px;
+		border-radius: 25px;
+		background-color: #e31ce6;
+	}
+</style>
+
+<body>
+	<div id="app">
+		<div class="main">
+			<div class="title"><img :src='`http://zhiboapi.mengwx.com/${data_user.headimg}`' alt=""></div>
+			<div class="grdata">
+				<h1>昵称：{{data_user.nicename}}</h1><span>账号：{{data_user.uname}}</span><span>性别：{{data_user.sex}}</span></div>
+			<div class="zbtime">
+				<h1>直播结束了</h1>
+				<h1>直播时长：{{data_zhibo.sc}}分钟</h1>
+			</div>
+			<div class="zb_earnings">
+				<div class="earnings">
+					<h1>{{data_zhibo.line_rs}}</h1>
+					<div>观看人数</div>
+				</div>
+				<div class="earnings">
+					<h1>{{data_zhibo.bcsy}}</h1>
+					<div>本场收益</div>
+				</div>
+				<div class="earnings">
+					<h1>{{data_zhibo.add_fs}}</h1>
+					<div>新增粉丝</div>
+				</div>
+			</div>
+			<div class="footer_wenzi" tapmode onclick="closezb_over()">我知道了</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script>
+	apiready = function() {
+		km_apiready('frm')
+		api.addEventListener({
+			name: 'keyback'
+		}, function(ret, err) {
+			api.closeToWin({
+				name: 'root'
+			});
+			$api.setStorage('data_user', '');
+			$api.setStorage('data_zhibo', '');
+		});
+	};
+	var vuedata = {
+		'data_user': {},
+		'data_zhibo': {}
+	}
+	vuedata.data_user = $api.getStorage('data_user');
+	//console.log(JSON.stringify(vuedata.data_user));
+	vuedata.data_zhibo = $api.getStorage('data_zhibo');
+	//console.log(JSON.stringify(vuedata.data_zhibo.sc));
+	vuedata.data_user.sex == 1 ? vuedata.data_user.sex = '男' : vuedata.data_user.sex = '女';
+	//新增粉丝为null
+	if (vuedata.data_zhibo.add_fs == null) {
+		vuedata.data_zhibo.add_fs = 0
+	}
+	var app = new Vue({
+		el: '#app',
+		data: vuedata
+	});
+	function closezb_over(){
+		api.closeToWin({
+			name: 'root'
+		});
+		$api.setStorage('data_user', '');
+		$api.setStorage('data_zhibo', '');
+	}
+</script>
+
+</html>

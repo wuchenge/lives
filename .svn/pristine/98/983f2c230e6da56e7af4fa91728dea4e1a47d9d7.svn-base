@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>Document</title>
+    <style>
+        .video {
+            position: relative;
+            width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .video_son {
+            width: 48%;
+            padding: 5px;
+        }
+
+        .video_son img {
+            width: 100%;
+            height: 150px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="mui-slider">
+            <div class="mui-slider-group mui-slider-loop" style="height:200px">
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="../../img/4.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/1.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/2.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/3.jpg" /></a>
+                </div>
+                <div class="mui-slider-item">
+                    <a href="#"><img src="../../img/4.jpg" /></a>
+                </div>
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="../../img/1.jpg" /></a>
+                </div>
+            </div>
+            <div class="mui-slider-indicator">
+                <div class="mui-indicator mui-active"></div>
+                <div class="mui-indicator"></div>
+                <div class="mui-indicator"></div>
+                <div class="mui-indicator"></div>
+            </div>
+        </div>
+        <div class="video">
+            <div class="video_son" v-for="todo in lists" onclick="openshiping(this)" :data_id="todo.id" :room_type="todo.room_type" :jg="todo.jg" :dwtime_zs=todo.dwtime_zs><img :src='`http://zhiboapi.mengwx.com/${todo.img}`' /></div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script>
+    apiready = function() {
+        zhibo_list();
+        xiala();
+        iszbover();
+        islooking()
+    };
+    var vuedata = {
+            'lists': []
+        }
+        //console.log(vuedata.lists)
+    var app = new Vue({
+            el: '#app',
+            data: vuedata
+        })
+        // console.log(JSON.stringify( vuedata ))
+        // var aa=$api.getStorage('userinfo');
+        //打开视频win 并传值直播id
+    function openshiping(el) {
+        var uname = $api.getStorage('uname');
+        var data_id = $api.attr(el, 'data_id');
+        var room_type = $api.attr(el, 'room_type');
+        var jg = $api.attr(el, 'jg');
+        var js_jg = $api.attr(el, 'dwtime_zs');
+         //console.log(JSON.stringify(js_jg));
+        if (room_type == 1) {
+            api.confirm({
+                title: '提示',
+                msg: '当前是免费直播是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id)
+                }
+            });
+        } else if (room_type == 2) {
+            api.prompt({
+                msg: '当前房间是密码房,请输入密码',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                var password = ret.text;
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id,password,'','')
+                }
+            });
+        } else if (room_type == 3) {
+            api.confirm({
+                msg: '当前房间是门票房，是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                    jrzb(data_id,'',jg,'')
+                }
+            });
+        } else {
+            api.confirm({
+                msg: '当前房间是计时房，是否进入',
+                buttons: ['确定', '取消']
+            }, function(ret, err) {
+                if (ret.buttonIndex == 1) {
+                  api.ajax({
+                    url: km_sis('sis_url_api') + '/api/txy/check_user_look_zt',
+                    method: 'post',
+                    headers: km_fasong_tou('api/txy/check_user_look_zt', '', ''),
+                    data: {
+                        values: {
+                          type:2,
+                          uname: uname,
+                          zhibo_id: data_id
+                        }
+                    }
+                  },function(ret, err){
+                      if (ret) {
+                          console.log( JSON.stringify( ret ) );
+                          if(ret.apizt==1){
+                            var sy_free_time=ret.sy_free_time;
+                            api.confirm({
+                                title: '提示',
+                                msg: "当前直播间还剩余免费时间为"+sy_free_time+"分钟，是否进入",
+                                buttons: ['确定', '取消']
+                            }, function(ret, err){
+                                if( ret ){
+                                    if(ret.buttonIndex == 1) {
+                                        jrzb(data_id,'','','')
+                                    }
+                                }else{
+                                     alert( JSON.stringify( err ) );
+                                }
+                            });
+                          }else if(ret.apizt==2){
+                              api.confirm({
+                                  title: '提示',
+                                  msg: "当前无免费时间，每分钟"+js_jg+"钻石，是否进入",
+                                  buttons: ['确定', '取消']
+                              }, function(ret, err){
+                                  if( ret ){
+                                      if(ret.buttonIndex == 1) {
+                                          jrzb(data_id,'','',js_jg)
+                                      }
+                                  }else{
+                                       alert( JSON.stringify( err ) );
+                                  }
+                              });
+                          }else if(ret.apizt==3){
+                              api.confirm({
+                                  title: '提示',
+                                  msg: "当前无免费时间，每分钟"+js_jg+"砖石，是否进入",
+                                  buttons: ['确定', '取消']
+                              }, function(ret, err){
+                                  if( ret ){
+                                      if(ret.buttonIndex == 1) {
+                                          jrzb(data_id,'','',js_jg)
+                                      }
+                                  }else{
+                                       alert( JSON.stringify( err ) );
+                                  }
+                              });
+                          }else{
+                            alert("该账户余额不足")
+                          }
+                      } else {
+                          console.log( JSON.stringify( err ) );
+                      }
+                  });
+                }
+            });
+        }
+    }
+    //进入直播间发请求
+    function jrzb(data_id,password,jg,js_jg) {
+        var uname = $api.getStorage('uname');
+        zhibo_id=data_id;
+        password = password || '';
+        jg = jg || '';
+        js_jg = js_jg || '';
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/txy/getPlay',
+            method: 'post',
+            headers: km_fasong_tou('/api/txy/getPlay', '', ''),
+            data: {
+                values: {
+                    uname: uname,
+                    zhibo_id: data_id,
+                    password: password,
+                    jg:jg,
+                    js_jg:js_jg
+                }
+            }
+        }, function(ret, err) {
+             console.log(JSON.stringify(ret));
+            // console.log(JSON.stringify(err));
+            if (ret.apizt == 1) {
+                var bfdz = ret.zhibo_data.bfdz;
+                $api.setStorage('zhibo_data', ret.zhibo_data);//进入直播间获取的直播信息
+                $api.setStorage('user_lljl_id', ret.user_lljl_data.id);//该用户进入直播间的id
+                $api.setStorage('bfdz', bfdz);
+                $api.setStorage('data_id', ret.user_lljl_data.zhibo_id);
+                api.openWin({
+                    name: 'openbf_win',
+                    url: './openbf_win.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+                if(ret.other_data.sy_free_time!==""){
+                  console.log(1)
+                    var sy_free_time=ret.other_data.sy_free_time;
+                    if(sy_free_time>5){
+                      //alert("该直播间的免费时间为大于5分钟");
+                      var time5=setTimeout(popup,300000);
+                    }else {
+                      //alert("该直播间的免费时间为"+sy_free_time+"分钟");
+                      var sy_free_time= sy_free_time*60*1000+30000;
+                      var time1=setTimeout(popup,sy_free_time);
+                    }
+                    api.addEventListener({
+                          name: 'sy_free_time'
+                      }, function(ret, err) {
+                        if(ret){
+                          console.log(JSON.stringify(ret));
+                          sy_free_time=ret.value.sy_free_time;
+                          if(sy_free_time==0){
+                            console.log(1);
+                            // console.log(JSON.stringify( min1))
+                             clearTimeout(min1);
+                             clearTimeout(min5);
+                             clearTimeout(time1);
+                             clearTimeout(time5);
+                             return
+                          }else if(sy_free_time>5){
+                            console.log(2)
+                            var min5=setTimeout(popup,300000);
+                          }else if(0<sy_free_time<=5){
+                            console.log(3)
+                            var sy_free_time= sy_free_time*60*1000+30000;
+                            var min1=setTimeout(popup,sy_free_time);
+                          }
+                        }else {
+                          console.log(JSON.stringify(err));
+                        }
+                      });
+                }
+
+            }else {
+                km_toast(ret.msg)
+                console.log(JSON.stringify( ret))
+            }
+        });
+    }
+    //弹出计时状态付费弹窗
+    function popup(){
+      //监控免费时间还有都是
+      var user_lljl_id = $api.getStorage('user_lljl_id');
+      api.ajax({
+        url: km_sis('sis_url_api') + '/api/txy/check_user_look_zt',
+        method: 'post',
+        headers: km_fasong_tou('api/txy/check_user_look_zt', '', ''),
+        data: {
+            values: {
+                user_lljl_id:user_lljl_id
+            }
+        }
+      },function(ret, err){
+          console.log(JSON.stringify( ret));
+          if (ret) {
+            if(ret.apizt==1){
+              var sy_free_time=ret.sy_free_time;
+              api.sendEvent({
+                name: 'sy_free_time',
+                extra: {
+                  sy_free_time
+                }
+              });
+            }else if(ret.apizt==2){
+              var sy_free_time=ret.sy_free_time;
+              api.sendEvent({
+                name: 'sy_free_time',
+                extra: {
+                  sy_free_time
+                }
+              });
+              api.confirm({
+                  title: '提示',
+                  msg: '你的免费观看时间已用完，是否付费观看',
+                  buttons: ['确定', '取消']
+              }, function(ret, err) {
+                  var index = ret.buttonIndex;
+                  if(index==1){
+                    jszf();
+                  }else if(index==2){
+                    yeclosezb()
+                  }
+              });
+            }else if (ret.apizt==3) {
+              var sy_free_time=ret.sy_free_time;
+              api.sendEvent({
+        				name: 'sy_free_time',
+        				extra: {
+        					sy_free_time
+        				}
+        			});
+            }else {
+              stopPlay();
+              api.confirm({
+                  title: '提示',
+                  msg: '你的余额已不足，请退出直播间',
+                  buttons: ['确定', '取消']
+              }, function(ret, err){
+                  if( ret ){
+                    if(ret.buttonIndex==1){
+                      yeclosezb()
+                    }
+                  }else{
+                       alert( JSON.stringify( err ) );
+                  }
+              });
+            }
+          } else {
+              console.log( JSON.stringify( err ) );
+          }
+      });
+    }
+    //计时房支付接口
+    function jszf(){
+      var user_lljl_id=$api.getStorage('user_lljl_id');
+      var uname=$api.getStorage('uname');
+      console.log(uname)
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/Txy/room4_ff',
+            method: 'post',
+            headers: km_fasong_tou('api/Txy/room4_ff', '', ''),
+            data: {
+                values: {
+                    uname: uname,
+                    user_lljl_id:user_lljl_id
+                }
+            }
+        },function(ret, err){
+            if (ret) {
+                console.log( JSON.stringify( ret ) );
+                if(ret.apizt==1){
+                  console.log(JSON.stringify( ret.msg ));
+                }else {
+                  alert("该账户余额不足");
+                  yeclosezb()
+                }
+            } else {
+                console.log( JSON.stringify( err ) );
+            }
+        });
+    }
+    //获取直播列表
+    function zhibo_list() {
+        var zhibo_type = $api.getStorage('zhibo_type'); //直播类型
+        var arr_nav = [];
+        zhibo_type.map(a => arr_nav.push({
+            id: a.id,
+            name: a.name
+        }));
+        console.log(JSON.stringify( zhibo_type));
+        var type_id = api.pageParam.id;
+        //console.log(type_id);
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/Publics/zhibo_content_list',
+            method: 'post',
+            headers: km_fasong_tou('api/Publics/zhibo_content_list', '', ''),
+            data: {
+                values: {
+                    zhibo_type: type_id
+                }
+            }
+        }, function(ret, err) {
+            console.log(JSON.stringify(ret))
+            if (ret.apizt == 1) {
+                var lists = ret.lists;
+                $api.setStorage('lists', lists);
+                //console.log(JSON.stringify(lists));
+                vuedata.lists = $api.getStorage('lists');
+            } else {
+                console.log(JSON.stringify(err))
+            }
+        });
+    }
+    //下拉刷新
+    function xiala() {
+        api.setCustomRefreshHeaderInfo({
+            bgColor: '#C0C0C0',
+        }, function() {
+            var zhibo_type = $api.getStorage('zhibo_type'); //直播类型
+            var arr_nav = [];
+            zhibo_type.map(a => arr_nav.push({
+                id: a.id,
+                name: a.name
+            }));
+            //console.log(JSON.stringify( arr_nav));
+            var type_id = api.pageParam.id;
+            //console.log(type_id);
+            api.ajax({
+                url: km_sis('sis_url_api') + '/api/Publics/zhibo_content_list',
+                method: 'post',
+                headers: km_fasong_tou('api/Publics/zhibo_content_list', '', ''),
+                data: {
+                    values: {
+                        zhibo_type: type_id
+                    }
+                }
+            }, function(ret, err) {
+                console.log(JSON.stringify(ret))
+                if (ret.apizt == 1) {
+                    var lists = ret.lists;
+                    $api.setStorage('lists', lists);
+                    // console.log(JSON.stringify(lists));
+                    vuedata.lists = $api.getStorage('lists');
+                    api.refreshHeaderLoadDone()
+                } else {
+                    console.log(JSON.stringify(err))
+                }
+            });
+        });
+        // api.addEventListener({
+        //     name: 'shake'
+        // }, function(ret, err) {
+        //     api.refreshHeaderLoadDone()
+        // });
+    }
+    //判断主播是否有一场直播未关闭
+    function iszbover(){
+      var uname = $api.getStorage('uname');
+      if(uname!==''){
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/users/is_nobegian',
+            method: 'post',
+            headers: km_fasong_tou('api/users/is_nobegian', '', 'uname'),
+            data: {
+                values: {
+                    uname: uname
+                }
+            }
+        },function(ret, err){
+          console.log( JSON.stringify( ret ) )
+            if (ret) {
+              if(ret.apizt==1){
+                var zhibo_id=ret.data.id;
+                var uname=ret.data.username;
+
+                 console.log( JSON.stringify( zhibo_id ) );
+                 console.log( JSON.stringify( uname ) );
+                  api.confirm({
+                      title: '提示',
+                      msg: '你还有一场直播未关闭,是否继续',
+                      buttons: ['确定', '关闭']
+                  }, function(ret, err) {
+                      if(ret.buttonIndex==1){
+                        //主播异常继续播放
+                          api.ajax({
+                              url: km_sis('sis_url_api') + '/api/txy/getPush_continue',
+                              method: 'post',
+                              headers: km_fasong_tou('api/txy/getPush_continue', '', 'uname'),
+                              data: {
+                                  values: {
+                                      uname: uname
+                                  }
+                              }
+                          },function(ret, err){
+                              if (ret) {
+                                console.log(JSON.stringify( ret ))
+                                  if(ret.apizt==1){
+                                    api.openWin({
+                                        name: 'live_page_win',
+                                        url: '../video/live_page_win.html',
+                                        pageParam: {
+                                            name: 'test'
+                                        }
+                                    });
+                                  }
+                              } else {
+                                  console.log( JSON.stringify( err ) );
+                              }
+                          });
+
+                      }else {
+                        //异常时关闭直播
+                        api.ajax({
+                          url: km_sis('sis_url_api') + '/api/txy/stopPush_other',
+                          method: 'post',
+                          headers: km_fasong_tou('api/txy/stopPush_other', '', 'uname'),
+                          data: {
+                              values: {
+                                  uname: uname,
+                                  zhibo_id:zhibo_id
+                              }
+                          }
+                        },function(ret, err){
+                            console.log(JSON.stringify( ret ))
+                            if (ret) {
+                              if(ret.apizt==1)
+                                km_toast('成功关闭直播')
+                            } else {
+                                console.log(JSON.stringify( err ))
+                            }
+                        });
+                      }
+                  });
+              }
+            } else {
+                console.log( JSON.stringify( err ) );
+            }
+        });
+      }
+    }
+    //判断观众是否有一场直播未关闭
+    function islooking(){
+      var uname = $api.getStorage('uname');
+         console.log( JSON.stringify( uname ));
+      if(uname!==''){
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/users/is_looking',
+            method: 'post',
+            headers: km_fasong_tou('api/txy/is_looking', '', 'uname'),
+            data: {
+                values: {
+                    uname: uname
+                }
+            }
+        },function(ret, err){
+            if (ret) {
+                console.log( JSON.stringify( ret ) );
+              if(ret.apizt==1){
+                var id=ret.data.id;
+                var zhibo_id=ret.data.zhibo_id;
+                var uname= $api.getStorage('uname');
+                api.ajax({
+                  url: km_sis('sis_url_api') + '/api/txy/stopPlay_other',
+                  method: 'post',
+                  headers: km_fasong_tou('api/txy/stopPlay_other', '', 'uname'),
+                  data: {
+                      values: {
+                          uname:uname,
+                          zhibo_id:zhibo_id,
+                          user_lljl_id:id
+                      }
+                  }
+                },function(ret, err){
+                  console.log( JSON.stringify( ret ) );
+                    if (ret) {
+                      if(ret.apizt==1){
+                        console.log( JSON.stringify( ret ) );
+                          // km_toast('成功关闭直播')
+                        }
+                    } else {
+                        console.log( JSON.stringify( err ) );
+                    }
+                });
+              }
+            } else {
+                console.log( JSON.stringify( err ) );
+            }
+        });
+      }
+    }
+    //余额不足关闭直播间
+    function yeclosezb(){
+      //关闭直播间
+      var user_lljl_id = $api.getStorage('user_lljl_id');
+      console.log(JSON.stringify(user_lljl_id));
+      var data_id = $api.getStorage('data_id');
+      console.log(JSON.stringify(data_id));
+      var uname = $api.getStorage('uname');
+      api.ajax({
+          url: km_sis('sis_url_api') + '/api/txy/stopPlay',
+          method: 'post',
+          headers: km_fasong_tou('/api/txy/stopPlay', '', 'admin'),
+          data: {
+              values: {
+                  user_lljl_id: user_lljl_id,
+                  zhibo_id: data_id,
+                  uname: uname
+              }
+          }
+      }, function(ret, err) {
+          console.log(JSON.stringify(ret));
+          if (ret.apizt == 1) {
+            $api.setStorage('userinfo', ret.data_user); //更新用户信息
+            var userinfo=$api.getStorage('userinfo');
+            console.log(userinfo.jb_sl5)
+            api.sendEvent({
+              name: 'userinfo',
+              extra: {
+                userinfo
+                }
+            });
+            alert("你当前消费了"+ret.data_lljl.gx+"钻石")
+            api.closeWin({
+                name: 'openbf_win'
+            });
+          } else {
+              console.log(JSON.stringify(err));
+          }
+      });
+    }
+    //观众结束拉流
+    function stopPlay(){
+      api.execScript({
+          name: 'openbf_win',
+          frameName: 'openbf_frm',
+          script: 'stopPlay()'
+      });
+    }
+</script>
+
+</html>

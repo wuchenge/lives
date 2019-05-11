@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>账户</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+
+</style>
+<body>
+		<header class="mui-bar mui-bar-nav" style="height:62px">
+			<a tapmode onclick="closebangdan()" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">账户信息</h1>
+		</header>
+		<footer></footer>
+</body>
+<script type="text/javascript" src="../../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script type="text/javascript">
+apiready = function () {
+		 km_apiready('win');
+		openbangdan_frm();
+}
+
+function openbangdan_frm(){
+	api.openFrame({
+	    name: 'account_frm',
+	    url: 'account_frm.html',
+	    rect: {
+	        x: 0,
+	        y: $api.offset($api.dom('header')).h,
+	        w: 'auto',
+	        h: 'auto'
+	    },
+	    pageParam: {
+	        name: 'test'
+	    },
+	    bgColor: 'rgba(0,0,0,0)',
+			allowEdit:true,
+	    vScrollBarEnabled: true,
+	    hScrollBarEnabled: true
+	});
+}
+function closebangdan(){
+	api.closeWin({
+	    name: 'account_win'
+	});
+}
+</script>
+</html>

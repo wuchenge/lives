@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/aui/css/aui.css" />
+    <title>播放直播界面</title>
+    <style>
+        body,
+        html {
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../res/aui/js/aui_dialog.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        opnebf2()
+    };
+
+    function opnebf2() {
+        var bfdz = $api.getStorage('bfdz');
+        //拉流界面
+        var txLive = api.require('txLive');
+        txLive.openPlayer({
+            x: 0,
+            y: 0,
+            h: api.winHeight,
+            w: api.winWidth,
+            url: bfdz,
+            fixedOn: 'openbf_frm'
+        });
+        //开始拉流
+        txLive.startPlay();
+        //拉流上面的ui
+        api.openFrame({
+            name: 'video_paly_frm',
+            url: './video_paly_frm.html',
+            rect: {
+                x: 0,
+                y: 20,
+                w: 'auto',
+                h: 500
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: true,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+
+    }
+</script>
+
+</html>

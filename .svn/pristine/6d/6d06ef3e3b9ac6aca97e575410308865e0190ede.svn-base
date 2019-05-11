@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>直播页面</title>
+    <style>
+        .neirou {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #ff0;
+        }
+
+        .neirou .son {
+            position: relative;
+            width: 100%;
+            height: 50%;
+        }
+
+        .son button {
+            position: absolute;
+            width: 90%;
+            height: 50px;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            border-radius: 15px
+        }
+        .son .ly{
+          position: absolute;
+          width: 90%;
+          height: 50px;
+          top:100px;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          margin: auto;
+          line-height: 50px;
+          overflow-x: scroll;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class='neirou'>
+            <div class="son">
+                <button type="button" class="mui-btn mui-btn-primary" onclick="kaisp()">开直播</button>
+            </div>
+            <div class="son">
+
+                <button type="button" class="mui-btn mui-btn-primary apply_zb" onclick="apply_zb()" v-if="userinfo.sqzb_state==2" disabled="disabled">你已经是主播了</button>
+                <button type="button" class="mui-btn mui-btn-primary apply_zb" onclick="apply_zb()" v-else-if="userinfo.sqzb_state==3" disabled="disabled">申请中</button>
+                <div v-else-if="userinfo.sqzb_state==4">
+                  <button type="button" class="mui-btn mui-btn-primary apply_zb" onclick="apply_zb()" >申请失败，请重试</button>
+                  <div class="ly"></div>
+                </div>
+                <button type="button" class="mui-btn mui-btn-primary apply_zb" onclick="apply_zb()" v-else>申请主播</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script>
+    var vuedata = {
+        userinfo: {}
+    }
+    vuedata.userinfo = $api.getStorage('userinfo');
+   //console.log(JSON.stringify(vuedata.userinfo.sqzb_state))
+    var app = new Vue({
+        el: '#app',
+        data: vuedata
+    })
+    apiready = function() {
+        km_apiready('frm');
+        acquireusername();
+    };
+
+    //获取username
+    function acquireusername() {
+        var uname =$api.getStorage('userinfo').uname;
+        //获取用户申请主播的状态 同时发送广播
+        api.ajax({
+            url: km_sis('sis_url_api') + '/api/users/ajax_userinfo',
+            method: 'post',
+            headers: km_fasong_tou('api/users/ajax_userinfo', '', uname),
+            data: {
+                values: {
+                    uname: uname,
+                }
+            }
+        }, function(ret, err) {
+            if (ret) {
+                console.log(JSON.stringify(ret));
+                if (ret.apizt == 1) {
+                    $api.setStorage('userinfo', ret.data);
+                    var userinfo = $api.getStorage('userinfo');
+                    api.sendEvent({
+                        name: 'userinfo',
+                        extra: {
+                            userinfo
+                        }
+                    });
+                    //获取用户申请主播的状态
+                  //  console.log(userinfo.sqzb_state)
+                    if(userinfo.sqzb_state==4){
+                      api.ajax({
+                          url: km_sis('sis_url_api') + '/api/users/sqzb_content',
+                          method: 'post',
+                          headers: km_fasong_tou('api/users/sqzb_content', '', uname),
+                          data: {
+                              values: {
+                                  uname: uname,
+                              }
+                          }
+                      },function(ret, err){
+                          if (ret) {
+                              if(ret.apizt==1){
+                                $api.text($api.dom('.ly'),"驳回理由："+ ret.data[0].memo);
+                              }
+                          } else {
+                              alert( JSON.stringify( err ) );
+                          }
+                      });
+                    }
+                }
+            } else {
+                console.log(JSON.stringify(err));
+            }
+        });
+
+    }
+    //申请主播
+    function apply_zb() {
+        if (vuedata.userinfo.sqzb_state == 1 || vuedata.userinfo.sqzb_state == 4) {
+            api.openWin({
+                name: 'apply_zb_win',
+                url: './apply_zb_win.html',
+                pageParam: {
+                    name: 'test'
+                }
+            });
+        }
+    }
+    //打开直播页面
+    function kaisp() {
+        if (vuedata.userinfo.sqzb_state == 2) {
+            api.openWin({
+                name: 'zhibo_jiemian_win',
+                url: './zhibo_jiemian_win.html',
+                pageParam: {
+                    name: 'test'
+                }
+            });
+        } else {
+            alert("你还不是主播")
+        }
+    }
+</script>
+
+</html>

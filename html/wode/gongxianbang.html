@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>贡献榜</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+
+</style>
+<body>
+		<header class="mui-bar mui-bar-nav" style="height:62px">
+			<a  onclick="closegongxianbang()" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" onclick="closegongxianbang()">贡献榜</h1>
+		</header>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+apiready = function () {
+		$api.fixStatusBar( $api.dom('header'));
+		opengongxianbang_frm();
+}
+
+function opengongxianbang_frm(){
+	api.openFrame({
+	    name: 'gongxianbang_frm',
+	    url: 'gongxianbang_frm.html',
+	    rect: {
+	        x: 0,
+	        y: $api.offset($api.dom('header')).h,
+	        w: 'auto',
+	        h: 'auto'
+	    },
+	    pageParam: {
+	        name: 'test'
+	    },
+	    bgColor: 'rgba(0,0,0,0)',
+	    vScrollBarEnabled: true,
+	    hScrollBarEnabled: true
+	});
+}
+function closegongxianbang(){
+	api.closeWin({
+	    name: 'gongxianbang'
+	});
+}
+</script>
+</html>

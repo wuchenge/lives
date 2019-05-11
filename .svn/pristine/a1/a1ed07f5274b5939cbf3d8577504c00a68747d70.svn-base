@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css" />
+    <link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css" />
+    <title>直播界面</title>
+    <style>
+        body,
+        html {
+            background: transparent !important;
+        }
+
+        .shade {
+            position: fixed;
+            width: 100%;
+            height: 800px;
+            visibility: hidden;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+        }
+
+        .footer_lw {
+            position: absolute;
+            visibility: hidden;
+            width: 100%;
+            height: 280px;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 300;
+        }
+
+        .lw {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .lw_item {
+            width: 25%;
+            height: 100px;
+            float: left;
+            font-size: 12px;
+            text-align: center;
+            color: #fff
+        }
+
+        .lw_item_img{
+            width: 90% !important;
+            height: 60px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .lw_sum {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid red;
+            line-height: 60px;
+            text-align: center;
+            color: #fff
+        }
+
+        .lw_sum .lw_footer {
+            width: 20%;
+            height: 60px;
+        }
+
+        .lw_zs {
+            width: 50%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lw_zs .count {
+            width: 15%;
+        }
+
+        .add,
+        .cut {
+            width: 25%;
+        }
+
+        .bestowal {
+            width: 35%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='app'>
+        <div class="shade" tapmode onclick="closelwfrm()"></div>
+        <div class="footer_lw">
+            <div class="lw">
+                <div class="mui-slider">
+                    <div class="mui-slider-group"  >
+                        <div class="mui-slider-item">
+                            <div class="lw_item" v-for="todo in lw_lists"><img :src='`http://zhiboapi.mengwx.com/${todo.jpg}`' / class="lw_item_img"><span>{{todo.name}}</span><span>({{todo.jb_sl}}砖石)</span></div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="mui-slider-item" v-for="todo in pagess">
+                          <div class="lw_item" v-for="todo in lw_lists"><img :src='`http://zhiboapi.mengwx.com/${todo.jpg}`' / class="lw_item_img"><span>{{todo.name}}</span><span>({{todo.jb_sl}}砖石)</span></div>
+                          <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div class="mui-slider-indicator">
+                        <div class="mui-indicator mui-active" ></div>
+                        <div class="mui-indicator" v-for="todo in pagess"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lw_sum">
+                <div class="lw_footer">余额:{{userinfo.jb_sl5}}</div>
+                <div class="lw_zs">
+                    <div class="cut" tapmode onclick="cut()">-</div>
+                    <div class="count">1</div>
+                    <div class="add" tapmode onclick="add()">+</div>
+                    <div class="bestowal" tapmode onclick="zslw()">赠送</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer></footer>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script type="text/javascript">
+
+    apiready = function() {
+        km_apiready('frm');
+        openlw();
+        lw_list();
+        document.querySelector('.mui-slider').addEventListener('slide', function(event) {
+          var current_num = event.detail.slideNumber;
+　　　　      var page=current_num+1;
+
+            lw_list(page);
+        });
+    };
+    var vuedata = {
+        'userinfo':{},
+        'lw_lists': [],
+        'pages':"",
+        'pagess':""
+    }
+
+    vuedata.userinfo = $api.getStorage('userinfo');
+    //console.log(JSON.stringify(vuedata.userinfo.ljsy))
+    var app = new Vue({
+        el: '#app',
+        data: vuedata
+    })
+    //赠送礼物
+    function zslw(){
+        var sum=$api.text($api.dom('.count'));
+        alert(sum)
+    }
+    //礼物数量加
+    function add(){
+      var sum=$api.text($api.dom('.count'));
+      sum++;
+      $api.text($api.dom('.count'),sum)
+    }
+    //礼物减
+    function cut(){
+      var sum=$api.text($api.dom('.count'));
+      sum--;
+      if(sum<1){
+        sum=1;
+        $api.text($api.dom('.count'),sum)
+      }else {
+        $api.text($api.dom('.count'),sum)
+      }
+
+    }
+    //礼物显示
+    function openlw() {
+        var shade = $api.dom('.shade');
+        shade.style.visibility = 'visible';
+        var footer_lw = $api.dom('.footer_lw');
+        footer_lw.style.visibility = 'visible';
+    }
+
+    function closelwfrm() {
+        api.closeFrame({
+            name: 'live_lw_frm'
+        });
+
+    }
+    function lw_list(page){
+      api.ajax({
+        url: km_sis('sis_url_api') +'/api/caiwu/lw_list',
+        method: 'post',
+        headers: km_fasong_tou('api/caiwu/lw_list', '', ''),
+        data: {
+            values: {
+                page:page
+            }
+        }
+      },function(ret, err){
+          if (ret) {
+              console.log( JSON.stringify( ret ) );
+              if(ret.apizt==1){
+                var userinfo=$api.getStorage('userinfo'); //用户名
+                vuedata.userinfo=userinfo;
+                vuedata.lw_lists=ret.lists;
+                vuedata.pages=ret.pages;
+                vuedata.pagess=ret.pages-1;
+              }
+          } else {
+              console.log( JSON.stringify( err ) );
+          }
+      });
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,16 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[svn-remote "svn"]
+	url = svn://svn7.apicloud.com/A6000831611081/live
+	fetch = :refs/remotes/git-svn
+[user]
+	name = w752042094@163.com
+	email = w752042094@163.com
+[gui]
+	wmstate = normal
+	geometry = 841x483+100+100 189 218

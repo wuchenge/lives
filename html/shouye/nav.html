@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <style>
+    html, body {
+        height: 42px;
+    }
+    </style>
+</head>
+
+<body>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+
+  apiready = function() {
+    opennav();
+    // fnNvnsetSelected(0);
+  };
+
+
+function opennav(){
+  console.log(JSON.stringify(km_fasong_tou('api/Publics/menu_list', '', '')));
+  console.log(km_sis('sis_url_api') +'/api/Publics/menu_list');
+    api.ajax({
+        url: km_sis('sis_url_api') +'/api/Publics/menu_list',
+        method: 'post',
+        headers: km_fasong_tou('api/Publics/menu_list', '', ''),
+        data: {
+            values: {
+
+            }
+        }
+    },function(ret, err){
+      // console.log(JSON.stringify( ret ))
+        if (ret) {
+            alert( JSON.stringify( ret ) );
+          if(ret.apizt==1){
+            //  console.log(JSON.stringify( ret))
+              var arr_nav = [];
+              //for循环
+          		// for(let i in ret.lists) {
+          		// 	a.push(title:{ret.lists[i].name})
+          		// }
+              //forEach循环
+              // ret.lists.forEach(function(v){
+              //   arr_nav.push({title:v.name})
+              //     console.log(JSON.stringify(arr_nav ));
+              // });
+              //es6
+              ret.lists.map(a => arr_nav.push({title:a.name}))
+              // console.log(JSON.stringify( arr_nav ));
+              var zhibo_type=[];
+              zhibo_type.map(a => arr_nav.push({id:a.id,name:a.name}));
+              // console.log(JSON.stringify( arr_nav));
+              $api.setStorage('zhibo_type', ret.lists); //直播类型
+              // console.log(JSON.stringify( zhibo_type));
+              var NVNavigationBar = api.require('NVNavigationBar');
+              NVNavigationBar.open({
+                  rect: {
+                      x: 0,
+                      y: 0,
+                      w: api.frameWidth,
+                      h: 44
+                  },
+                  styles: {
+                      orientation: 'horizontal',
+                       bg: '#B2B2B2',
+                      // background: linear-gradient(to right, #CE48FD, #7A29F4);
+                      bgAlpha: 0.5,
+                      font: {
+                          size: 16,
+                          sizeSelected: 18,
+                          color: '#FFFFFF',
+                          colorSelected: '#ff0000'
+                      },
+                      itemSize: {
+                          w: 70,
+                          h: 44
+                      }
+                  },
+                  items:arr_nav ,
+                  selectedIndex: 0,
+                  fixedOn: api.frameName,
+                  fixed: true,
+                  id: 'first'
+              }, function(ret, err) {
+                  // console.log(JSON.stringify(ret.index))
+                  if (ret.eventType == 'click') {
+                      api.execScript({
+                          name: 'root',
+                          // frameName: 'frmName',
+                          script: 'fnsetFrameGroupIndex("group","' + ret.index + '");'
+                      });
+                  }
+              });
+          }
+        } else {
+             console.log( JSON.stringify( err ) );
+        }
+    });
+
+}
+
+
+function fnNvnsetSelected(index) {
+
+    var NVNavigationBar = api.require('NVNavigationBar');
+    NVNavigationBar.setSelected({
+        id: 'first',
+        index: index,
+        selected: true
+    }, function(ret) {
+
+    });
+}
+</script>
+
+</html>

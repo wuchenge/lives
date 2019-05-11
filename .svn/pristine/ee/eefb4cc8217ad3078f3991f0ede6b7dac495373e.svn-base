@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../res/aui/css/aui.css" />
+    <title>直播界面</title>
+    <style>
+    body,
+    html {
+        background: transparent !important;
+        background: red;
+    }
+
+    header {
+        height: 60px;
+        border: 1px solod red;
+    }
+
+    .guanbi {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        right: 20px;
+        top: 50px;
+        line-height: 30px;
+        color: #fff;
+        text-align: center;
+        background: blue;
+    }
+    .footer_fs{
+      position: absolute;
+      visibility: hidden;
+      width: 100%;
+      height: 40px;
+      bottom: 0;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items:center;
+      z-index: 300;
+    }
+    .footer_fs .fa_neirou{
+      background: rgb(200, 200, 200);
+      width: 70%;
+      height: 30px;
+      border-radius: 5px;
+      color: #000;
+      padding: 0 16px;
+    }
+    .footer_fs div{
+      width: 25%;
+      height: 30px;
+      border-radius: 5px;
+      background: rgb(200, 200, 200);
+    }
+    .ui_footer{
+      position: absolute;
+      width: 100%;
+      height: 40px;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items:center;
+    }
+    .renovate{
+      width: 80px;
+      height: 40px;
+      line-height: 40px;
+      color: #fff;
+      text-align: center;
+    }
+    .shade{
+        position: fixed;
+        width: 100%;
+        height:800px;
+        visibility: hidden;
+        top:0;
+        left: 0;
+        background:rgba(0,0,0,0.5);
+        z-index: 200;
+    }
+    </style>
+</head>
+
+<body>
+  <div id='app'>
+      <div class="shade" tapmode onclick="hidden_input()"></div>
+      <div class="guanbi" tapmode onclick="closezb()">X</div>
+      <div class="ui_footer">
+        <div class="renovate" tapmode onclick="openinput()"><i class="aui-iconfont aui-icon-edit"></i></div>
+        <div class="renovate" tapmode onclick="renovate()"><i class="aui-iconfont aui-icon-refresh"></i></div>
+        <div class="renovate" tapmode onclick="openlw()"><i class="aui-iconfont aui-icon-edit"></i></div>
+      </div>
+      <div class="footer_fs">
+        <input type="text" class="fa_neirou" >
+        <div class="aui-btn" tapmode onclick="fs_barrage()">发送</div>
+      </div>
+  </div>
+  <footer></footer>
+</body>
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../res/aui/js/aui_dialog.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        openzbui();
+        km_apiready('frm')
+    };
+    function openlw(){
+      api.openFrame({
+          name: 'live_lw_frm',
+          url: '../video/live_lw_frm.html',
+          rect: {
+              x: 0,
+              y: 0,
+              w: 'auto',
+              h: 'auto'
+          },
+          pageParam: {
+              name: 'test'
+          },
+          bgColor: 'rgba(0,0,0,0)',
+          vScrollBarEnabled: true,
+          hScrollBarEnabled: true
+      });
+
+    }
+    //输入显示
+    function openinput(){
+      var shade=$api.dom('.shade');
+      shade.style.visibility='visible';
+      var div_input=$api.dom('.footer_fs');
+      div_input.style.visibility='visible';
+    }
+    //输入隐藏
+    function hidden_input(){
+      var shade=$api.dom('.shade');
+      shade.style.visibility='hidden';
+      var div_input=$api.dom('.footer_fs');
+      div_input.style.visibility='hidden';
+    }
+    //刷新
+    function renovate(){
+      api.execScript({
+          name: 'openbf_win',
+          frameName: 'openbf_frm',
+          script: 'refurbish()'
+      });
+    }
+    //模拟用户发送消息
+    function fs_barrage(){
+      var fa_neirou=$api.val($api.dom('.fa_neirou'))
+        console.log(JSON.stringify( fa_neirou ));
+      var demo = api.require('liveUI');
+      var param = {
+          uid : new Date().getTime(),//用户id
+          startnum : 1,  //等级
+          nickname : "小气鬼"+new Date().getTime(),//用户名称
+          nicknameColor : "#BA55D3",//用户名称字体颜色
+          message : fa_neirou,//消息
+          messageColor : "#DDA0DD"//消息字体颜色
+      };
+      //消息列表显示
+      demo.showMessage(param, function(ret, err) {
+          if(ret){
+            $api.val($api.dom('.fa_neirou'),"")
+          }
+      });
+      //弹幕显示
+      demo.showDanmu(param, function(ret, err) {
+          api.toast({msg : JSON.stringify(ret)+"  "+JSON.stringify(err)});
+      });
+    }
+    //直播ui
+    function openzbui() {
+        var zhibo_data = $api.getStorage('zhibo_data');
+        //console.log(JSON.stringify(zhibo_data));
+        var userList = new Array();
+        var msgList = new Array();
+        var demo = api.require('liveUI');
+        for (var i = 0; i < 5; i++) {
+            var data1 = {
+                uid: i, //用户id
+                nickname: "小气鬼" + new Date().getTime(), //用户名称
+                headpic: "widget://image/mac.png", //用户头像
+                starpic: "widget://image/icon_live_toolbar_send_star.png" //等级图标
+            };
+            userList.push(data1);
+        }
+
+        var param = {
+            roomName: zhibo_data.zhibo_name, //房间名称
+            uid: zhibo_data.userid, //用户id
+            name: zhibo_data.nicename, //用户名称或者直播名称
+            headpic: `http://zhiboapi.mengwx.com/${zhibo_data.headimg}`, //用户头像或者直播房间头像
+            starpic: "widget://image/icon_live_toolbar_send_star.png", //等级图标
+            isDanmu: true, //是否开启弹幕
+            isShowGuanZhuBtn: true, //是否显示关注按钮
+            memberCounts: zhibo_data.line_rs, //观看人数
+            userList: userList,
+            messageList: msgList,
+            fixedOn: api.frameName,
+            fixed: true
+        };
+        demo.openLiveUI(param, function(ret, err) {
+          if(ret.eventType=='onClickGuanZhu'){
+              alert("你点击了关注");
+          }else if (ret.eventType=='onClickHeadIcon') {
+              alert("你点击了主播头像");
+          }else if (ret.eventType=='onClickUserList') {
+              alert("点击观众列表某用户头像");
+          }else if (ret.eventType=='onClickMessage') {
+              alert("点击消息列表某条消息");
+          }
+        });
+    }
+</script>
+
+</html>

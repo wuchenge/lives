@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>消息</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+
+</head>
+<style>
+	.tanout{
+		position: absolute;
+		width: 200px;
+		height: 150px;
+		top:0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: auto;
+	}
+	.tanout .title{
+		position: relative;
+		width: 200px;
+		height: 40px;
+		text-align: center;
+		line-height: 40px;
+	}
+	.tanout .neirou{
+		position: relative;
+		width: 200px;
+		height: 60px;
+		text-align: center;
+	}
+	.tanout .footer{
+		width: 200px;
+		height: 50px;
+		display: flex;
+		justify-content: space-between;
+	}
+	.tanout .footer div{
+		width: 50%;
+		height: 50px;
+		line-height:50px;
+		text-align: center;
+		color: blue
+	}
+</style>
+<body>
+	<div class="tanout">
+		<div class="title">提示</div>
+		<div class="neirou">内容你打算放家里的开始放假第三方</div>
+		<div class="footer">
+			<div>取消</div>
+			<div>确定</div>
+		</div>
+	</div>
+</body>
+
+</html>

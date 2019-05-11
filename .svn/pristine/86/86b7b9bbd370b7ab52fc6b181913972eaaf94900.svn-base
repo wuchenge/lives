@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>转出</title>
+    <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css" />
+</head>
+<style>
+    body,
+    html {
+        background: transparent !important;
+    }
+
+    .zhezhao {
+        position: fixed;
+        width: 100%;
+        height: 800px;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+    }
+
+    .box_father {
+        position: fixed;
+        width: 100%;
+        height: 500px;
+        z-index: 1000;
+    }
+
+    .box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 80%;
+        height: 125px;
+        margin: auto;
+        z-index: 1000;
+    }
+
+    .mui-btn-primary {
+        margin-right: 80px;
+    }
+
+    .mui-input-group:after {
+        height: 0
+    }
+
+    .mui-input-group:before {
+        height: 0
+    }
+
+    .mui-input-group {
+        border-radius: 5px;
+    }
+
+    input::-webkit-input-placeholder {
+        font-size: 12px
+    }
+    .out_title{
+        position: relative;
+        width: 100%;
+        text-align:center;
+        font-size: 16px;
+    }
+</style>
+
+<body>
+    <div class="zhezhao"></div>
+    <div class="box_father">
+        <div class="box">
+            <form class="mui-input-group">
+                <div class="out_title">
+                    转出到砖石余额
+                </div>
+                <div class="mui-input-row">
+                    <label>金额：</label>
+                    <input type="number" class="mui-input-clear" placeholder="请输入要转出的金额" v-model='val' pattern="[0-9]*">
+                </div>
+                <div class="mui-button-row">
+                    <button type="button" class="mui-btn mui-btn-primary" tapmode onclick="closefrarecharge()">取消</button>
+                    <button type="button" class="mui-btn mui-btn-danger" tapmode @click="recharge()">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+<script type="text/javascript" src="../../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script src="../../../script/vue_min.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+
+    }
+
+    var app = new Vue({
+        el: '.mui-input-group',
+        data: {
+            val: ''
+        },
+        methods: {
+            //充值
+            recharge: function() {
+              var userinfo =$api.getStorage('userinfo');
+              var uname=userinfo.uname;
+              var jg = this.val;
+               console.log(JSON.stringify(userinfo.yhye));
+               console.log(JSON.stringify(jg));
+              if(parseInt(jg)>parseInt(userinfo.yhye)){
+                // alert(1)
+                  km_toast('转出失败，账号余额不足');
+                  return;
+              }else if (jg==0) {
+                  km_toast('转出失败，转出金额必须大于0');
+                  return;
+              }
+                api.ajax({
+                    url: km_sis('sis_url_api') + '/api/caiwu/zhuanchu',
+                    method: 'post',
+                    headers: km_fasong_tou('api/caiwu/zhuanchu', '', uname),
+                    data: {
+                        values: {
+                            uname: uname,
+                            jg: jg
+                        }
+                    }
+                }, function(ret, err) {
+                  console.log(JSON.stringify(ret));
+                    if (ret.apizt==1) {
+                        $api.setStorage('userinfo', ret.data); //更新用户信息
+                        var userinfo=$api.getStorage('userinfo');
+                        // console.log(JSON.stringify(ret.data.yhye));
+                        // console.log(JSON.stringify(ret.data.jb_sl5));
+                        api.sendEvent({
+                          name: 'userinfo',
+                          extra: {
+                            userinfo
+                            }
+                        });
+                        km_toast('充值成功');
+                        api.closeFrame({
+                            name: 'rolloutfrm'
+                        });
+
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+
+            }
+        }
+    })
+
+
+    //取消
+    function closefrarecharge() {
+        api.closeFrame({
+            name: 'rolloutfrm'
+        });
+    }
+</script>
+
+</html>

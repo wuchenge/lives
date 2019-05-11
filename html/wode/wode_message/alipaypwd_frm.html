@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>修改支付密码</title>
+    <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui_min.css"/>
+    <style>
+      .tijiao{
+        position: relative;
+        width: 90%;
+        display:block;
+        margin:0 auto;
+        border-radius: 5px;
+      }
+    </style>
+</head>
+<body>
+  <div class='neirou'>
+      <div class="mui-input-row">
+          <label>原始支付密码</label>
+          <input type="text" class="mui-input-clear oldpwd" placeholder="请输入密码" value="">
+      </div>
+      <div class="mui-input-row input_yanzheng">
+        <label>新密码</label>
+        <input type="text" class="mui-input-clear pwd" placeholder="请输入新密码" value="">
+      </div>
+      <div class="footer_button">
+          <button type="button" class="mui-btn mui-btn-royal tijiao"  onclick="setpwd()">确认</button>
+      </div>
+  </div>
+</body>
+<script type="text/javascript" src="../../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script>
+  function setpwd(){
+    var uname=$api.getStorage('userinfo').uname;
+    var oldpwd=$api.val($api.dom('.oldpwd'));
+    var pwd=$api.val($api.dom('.pwd'));
+    var repwd=$api.val($api.dom('.repwd'));
+    var reg = /^[0-9a-zA-Z]*$/g;//正则表达式，必须是数字或者字母
+    if(pwd != ""&&oldpwd != ""&&!reg.test(pwd)){
+      km_toast("密码必须字母或者数字");
+    }
+    if(pwd != ""&&oldpwd != ""&&reg.test(oldpwd)){
+      km_toast("密码必须字母或者数字");
+    }
+    if(pwd==""||oldpwd==""){
+      km_toast("密码不能为空");
+      return
+    }
+    if(pwd.length<6||oldpwd.length<6){
+      km_toast("密码必须大于等于6位");
+      return
+    }
+    if(pwd!==repwd){
+      km_toast("两次密码不一致");
+      return
+    }
+    api.ajax({
+        // url: km_sis('sis_url_api') +'/api/users/update_pwd',
+        // method: 'post',
+        // headers: km_fasong_tou('api/users/update_pwd', '', uname),
+        // data: {
+        //     values: {
+        //         uname:uname,
+        //         pwd: pwd,
+        //         oldpwd: oldpwd,
+        //         repwd:repwd
+        //     }
+        // }
+    },function(ret, err){
+        if (ret) {
+            console.log( JSON.stringify( ret ) );
+            if(ret.apizt==1){
+              alert("修改密码成功")
+              api.closeWin({
+                  name: 'changepwd_win'
+              });
+
+            }
+        } else {
+            console.log( JSON.stringify( err ) );
+        }
+    });
+
+  }
+</script>
+</html>

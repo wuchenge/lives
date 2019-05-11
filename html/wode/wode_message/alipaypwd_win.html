@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>修改支付密码</title>
+    <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui_min.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav" style="height:62px">
+            <a tapmode onclick="closealipaypwd_win()" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">修改支付密码</h1>
+    </header>
+
+</body>
+<script type="text/javascript" src="../../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script>
+    apiready = function () {
+    		$api.fixStatusBar( $api.dom('header'));
+    		openalipaypwd_frm();
+    }
+    function openalipaypwd_frm(){
+      api.openFrame({
+          name: 'alipaypwd_frm',
+          url: 'alipaypwd_frm.html',
+          rect: {
+              x: 0,
+              y: $api.offset($api.dom('header')).h,
+              w: 'auto',
+              h: 'auto'
+          },
+          pageParam: {
+              name: 'test'
+          },
+          bounces: true,
+          bgColor: 'rgba(0,0,0,0)',
+          vScrollBarEnabled: true,
+          hScrollBarEnabled: true
+      });
+
+    }
+  function closealipaypwd_win(){
+    api.closeWin({
+        name: 'alipaypwd_win'
+    });
+
+  }
+</script>
+</html>

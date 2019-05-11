@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>账户</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../../res/aui/css/aui.css" />
+</head>
+<style>
+body,html{
+	-webkit-user-select:all
+}
+	.main {
+		position: relative;
+    width: 100%;
+    margin: 0 auto;
+    background: #fff;
+	}
+
+	.main_son {
+		position: relative;
+		width: 100%;
+		padding: 5px;
+	}
+
+	.main_son input {
+		width: 20%;
+		height: 25px;
+		font-size: 12px;
+		vertical-align: middle;
+		line-height: 12.5px;
+	}
+</style>
+
+<body>
+		<div class="main">
+			<div class="main_son">用户名:{{userinfo.uname}}</div>
+			<div class="main_son">
+				<span>砖石余额:{{userinfo.jb_sl5}}</span>
+				<input type="button" value="提现" tapmode onclick="">
+			</div>
+			<div class="main_son">
+				<span>银行余额:{{userinfo.yhye}}</span>
+				<input type="button" value="充值" tapmode onclick="openfrarecharge()">
+				<input type="button" value="转出" tapmode onclick="openrollout()">
+				<input type="button" value="转账" tapmode onclick="opentransfer()">
+			</div>
+			<div class="main_son">
+				<span style="word-break: break-all">银行卡号:{{userinfo.yh_account}}</span>
+			</div>
+			<!-- <div class="main_son">
+				<span style="word-break: break-all">支付密码:{{userinfo.zfmm}}</span>
+			</div> -->
+		</div>
+		<section class="aui-content">
+			<ul class="aui-list aui-list-in aui-margin-b-35">
+				<li class="aui-list-item" tapmode onclick="openrecharge_record_win()">
+					<div class="aui-list-item-inner aui-list-item-arrow">
+						<div class="aui-list-item-title">充值记录</div>
+					</div>
+				</li>
+				<li class="aui-list-item" tapmode onclick="">
+					<div class="aui-list-item-inner aui-list-item-arrow">
+						<div class="aui-list-item-title">提现记录</div>
+					</div>
+				</li>
+				<li class="aui-list-item"tapmode onclick="opentransferfrm_record_win()">
+					<div class="aui-list-item-inner aui-list-item-arrow">
+						<div class="aui-list-item-title">转出记录</div>
+					</div>
+				</li>
+				<li class="aui-list-item"tapmode onclick="openrolloutfrm_record_win()">
+					<div class="aui-list-item-inner aui-list-item-arrow">
+						<div class="aui-list-item-title">转账记录</div>
+					</div>
+				</li>
+				<li class="aui-list-item"tapmode onclick="">
+					<div class="aui-list-item-inner aui-list-item-arrow">
+						<div class="aui-list-item-title">转入记录</div>
+					</div>
+				</li>
+			</ul>
+		</section>
+
+</body>
+<script type="text/javascript" src="../../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script src="../../../script/vue_min.js"></script>
+<script>
+	var vuedata = {
+		'userinfo': {}
+	}
+	vuedata.userinfo = $api.getStorage('userinfo');
+	//console.log(JSON.stringify(vuedata.userinfo.zfmm))
+	var app = new Vue({
+		el: '.main',
+		data: vuedata
+	})
+
+	apiready = function() {
+			km_apiready('frm');
+			var clipBoard = api.require('clipBoard');
+			clipBoard.setListener(function(ret, err) {
+			    if (ret) {
+			        alert(JSON.stringify(ret));
+			    } else {
+			        alert(JSON.stringify(err));
+			    }
+			});
+		}
+		//打开充值页面
+	function openfrarecharge() {
+		//获取状态栏高度
+		var statusBar = api.require('statusBar');
+		var statusBarHeight = statusBar.getStatusBarHeight();
+		//获取main高度
+		var mainH = $api.offset($api.dom('.main')).h
+		api.openFrame({
+			name: 'rechargefrm',
+			url: './rechargefrm.html',
+			rect: {
+				x: 0,
+				y: 0,
+				w: 'auto',
+				h: 'auto'
+			},
+			pageParam: {
+				name: 'test'
+			},
+			bgColor: 'rgba(0,0,0,0)',
+			vScrollBarEnabled: true,
+			hScrollBarEnabled: true
+		});
+
+	}
+	//转出界面
+	function openrollout(){
+		api.openFrame({
+		    name: 'rolloutfrm',
+		    url: './rolloutfrm.html',
+		    rect: {
+		        x: 0,
+		        y: 0,
+		        w: 'auto',
+		        h: 'auto'
+		    },
+		    pageParam: {
+		        name: 'test'
+		    },
+		    bgColor: 'rgba(0,0,0,0)',
+		    vScrollBarEnabled: true,
+		    hScrollBarEnabled: true
+		});
+
+	}
+	//转账
+	function opentransfer(){
+		api.openFrame({
+		    name: 'transferfrm',
+		    url: './transferfrm.html',
+		    rect: {
+		        x: 0,
+		        y: 0,
+		        w: 'auto',
+		        h: 'auto'
+		    },
+		    pageParam: {
+		        name: 'test'
+		    },
+		    bounces: true,
+		    bgColor: 'rgba(0,0,0,0)',
+		    vScrollBarEnabled: true,
+		    hScrollBarEnabled: true
+		});
+
+	}
+	//充值记录
+	function openrecharge_record_win(){
+		api.openWin({
+		    name: 'recharge_record_win',
+		    url: './recharge_record_win.html',
+		    pageParam: {
+		        name: 'test'
+		    }
+		});
+	}
+	//转出记录
+	function opentransferfrm_record_win(){
+		api.openWin({
+		    name: 'transferfrm_record_win',
+		    url: './transferfrm_record_win.html',
+		    pageParam: {
+		        name: 'test'
+		    }
+		});
+	}
+	//转账记录
+	function openrolloutfrm_record_win(){
+		api.openWin({
+				name: 'rolloutfrm_record_win',
+				url: './rolloutfrm_record_win.html',
+				pageParam: {
+						name: 'test'
+				}
+		});
+	}
+</script>
+
+</html>

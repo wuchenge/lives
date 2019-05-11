@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>贡献榜</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+		ul,li{ padding:0;margin:0;list-style:none}
+		.main{
+			position: relative;
+			width: 80%;
+			height: 30px;
+			display:flex;
+			margin: 10px auto;
+		}
+		.main li{
+			position: relative;
+			width: 33%;
+			height: 30px;
+			flex:1;
+			line-height:30px;
+			text-align: center;
+
+		}
+		li:nth-child(1){
+			border:1px solid red;
+			border-top-left-radius:25px;
+			border-bottom-left-radius:25px;
+		}
+		li:nth-child(3){
+			border:1px solid red;
+			border-top-right-radius:25px;
+			border-bottom-right-radius:25px;
+		}
+		li:nth-child(2){
+			border-top:1px solid red;
+			border-bottom:1px solid red;
+		}
+		.yanse{
+			background: linear-gradient(to bottom left,#900a8c,#e092ea);
+		}
+</style>
+<body>
+		<ul class="main">
+			<li class="yanse">日榜</li>
+			<li>月榜</li>
+			<li>总榜</li>
+		</ul>
+</body>
+<script type="text/javascript" src="../../res/mui/js/mui_min.js"></script>
+<script type="text/javascript" src="../../res/mui/js/mui.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript">
+apiready = function () {
+		// $api.fixStatusBar( $api.dom('header'));
+		// api.setStatusBarStyle({
+		//     style: 'dark',
+		//     color: 'rgba(255,255,255,0.9)'
+		// });
+		// header_nav();
+}
+mui.init({
+	swipeBack:true //启用右滑关闭功能
+});
+</script>
+</html>

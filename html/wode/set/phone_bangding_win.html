@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>绑定手机号</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../dist/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../dist/css/mui.min.css"/>
+</head>
+<style>
+	header{
+		position: relative;
+		width: 100%;
+		height: 80px;
+		background: #fff;
+	}
+	.conter{
+		position: relative;
+		height: 80px;
+		text-align: center;
+		line-height: 90px;
+		color: #000;
+		z-index: 1;
+	}
+	.header_left{
+		position: absolute;
+		left:0;
+		top:30px;
+		z-index: 2;
+	}
+	.header_left img{
+		width: 26px;
+		height: 26px;
+	}
+	.xing_shou{
+		position: relative;
+		width:100%;
+		background: #fff;
+	}
+	.shou{
+		position: relative;
+		width: 90%;
+		height: 50px;
+		margin: 0 auto;
+		line-height: 50px;
+		border-bottom:1px solid #e8e3e3;
+	}
+	.shou .phone_input{
+		position: relative;
+		width: 100%;
+		height: 30px;
+		border:none;
+		background-color: #fff;
+		caret-color:red;
+		font-size: 12px;
+    background-image: url(../../img/root/icon/icon_biliao_1.png);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position:10px center;
+    padding:0 0 0 45px;
+	}
+	.phone_top{
+		position: relative;
+		width: 100%;
+		height: 200px;
+		vertical-align:middle;
+		border-bottom:1px solid #e8e3e3;
+
+	}
+	.phone_top img{
+		position: relative;
+		width: 100%;
+		height: 198px;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.phone_botton{
+		position: relative;
+	    width: 90px;
+	    height: 30px;
+	    text-align: center;
+	    font-size: 12px;
+	    z-index: 2000;
+	    display: inline-block;
+	    border-radius:25px;
+	    background:linear-gradient(to right,#d222ccdd,#8b63da);
+	    border:none;
+	}
+	.phone_botton_bang{
+		position: relative;
+		width: 80%;
+		height: 40px;
+		font-size: 12px;
+		display:block;
+		margin:50px auto;
+		border-radius:25px;
+		color:#fff;
+		background:#8b63da;
+		box-shadow: 0px 5px 25px #888888;
+	}
+</style>
+<body>
+	<header id="header">
+		<div class="header_left" tapmode onclick="closewinphone()"><img src="../../img/shezhi/1.png" alt=""></div>
+		<div class="conter">绑定手机号</div>
+	</header>
+	<div class="phone_top">
+		<img src="../../img/1.jpg" alt="">
+	</div>
+	<div class="xing_shou">
+		<div class="shou">
+			<input type="text" placeholder="请输入手机号" class="phone_input">
+		</div>
+	</div>
+	<div class="xing_shou">
+		<div class="shou">
+			<input type="text" placeholder="验证码" style="width:60%" class="phone_input">
+			<input class="phone_botton" onclick="fasong(this)" value="获取验证码"></input>
+		</div>
+	</div>
+	<button class="phone_botton_bang">立即绑定</button>
+</body>
+<script type="text/javascript" src="../../script/mui.js"></script>
+<script type="text/javascript" src="../../script/mui.min.js"></script>
+<script>
+		function closewinphone(){
+			api.closeWin({
+					name: 'phone'
+			});
+		}
+		var clock = '';
+    var nums = 60;
+    var btn;
+    function fasong(thisBtn){
+        btn = thisBtn;
+        btn.disabled = true; //将按钮置为不可点击
+        btn.value = nums+'s重新获取';
+        clock = setInterval(doLoop, 1000); //一秒执行一次
+      }
+      function doLoop(){
+        nums--;
+        if(nums > 0){
+         btn.value = nums+'s重新获取';
+        }else{
+         clearInterval(clock); //清除js定时器
+         btn.disabled = false;
+         btn.value = '获取验证码';
+         nums = 60; //重置时间
+        }
+      }
+</script>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>申请主播</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+	.textareaBox {
+	   position: relative;
+		 margin-top: 10px;
+	}
+
+	.wordsNum {
+	   position: absolute;
+		 bottom: 20px;
+	 	 right: 0px;
+	   color: #B3B3B3;
+	   font-size: 12px;
+	}
+	.mui-btn-primary{
+		width: 90%;
+		margin: 0 auto;
+		display: block;
+		border-radius: 15px
+	}
+</style>
+<body>
+	<div class="textareaBox">
+	    <textarea class="wishContent" placeholder="请输入你的申请理由" maxlength="50" rows="5" cols="20"></textarea>
+	    <span class="wordsNum">0/50</span>
+	</div>
+	<button type="button" class="mui-btn mui-btn-primary" onclick="apply_zb()">提交</button>
+</body>
+<script type="text/javascript" src="../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../res/aui/js/aui_actionsheet.js" ></script>
+<script type="text/javascript" src="../../script/vue_min.js"></script>
+<script type="text/javascript" src="../../script/js.js"></script>
+<script type="text/javascript" src="../../res/jquery/jquery_2_0_3.js"></script>
+<script type="text/javascript">
+//封装一个限制字数方法
+apiready = function () {
+
+}
+var checkStrLengths = function (str, maxLength) {
+    var maxLength = maxLength;
+    var result = 0;
+    if (str && str.length > maxLength) {
+        result = maxLength;
+    } else {
+        result = str.length;
+    }
+    return result;
+}
+//监听输入
+$(".wishContent").on('input propertychange', function () {
+    //获取输入内容
+    var userDesc = $(this).val();
+    //判断字数
+    var len;
+    if (userDesc) {
+        len = checkStrLengths(userDesc, 50);
+    } else {
+        len = 0
+    }
+    //显示字数
+    $(".wordsNum").html(len + '/50');
+});
+
+function apply_zb(){
+		  var ly=$(".wishContent").val();
+			var uname	=$api.getStorage('userinfo').uname;
+	    console.log(JSON.stringify( ly));
+			api.ajax({
+					url: km_sis('sis_url_api') +'/api/users/apply_zhubo',
+					method: 'post',
+					headers: km_fasong_tou('api/users/apply_zhubo', '', uname),
+					data: {
+							values: {
+									uname:uname,
+									ly:ly
+							}
+					}
+			},function(ret, err){
+			    if (ret) {
+			        console.log( JSON.stringify( ret ) );
+							if(ret.apizt==1){
+								$api.setStorage('userinfo',ret.userinfo);
+								var userinfo=$api.getStorage('userinfo');
+								api.sendEvent({
+									name: 'userinfo',
+									extra: {
+										userinfo
+									}
+								});
+								api.closeWin({
+								    name: 'apply_zb_win'
+								});
+
+							}
+			    } else {
+			        console.log( JSON.stringify( err ) );
+			    }
+			});
+
+}
+</script>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>开播提醒</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="../../dist/css/mui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../dist/css/mui.min.css"/>
+</head>
+<style>
+		body,html{
+			background-color:#ddd
+		}
+		header{
+			position: relative;
+			width: 100%;
+			height: 80px;
+			background: #fff;
+			margin-bottom: 20px
+		}
+		.conter{
+			position: relative;
+			height: 80px;
+			text-align: center;
+			line-height: 90px;
+			color: #000;
+			z-index: 1;
+		}
+		.header_left{
+			position: absolute;
+			left:0;
+			top:30px;
+			z-index: 2;
+		}
+		.header_left img{
+			width: 26px;
+			height: 26px;
+		}
+		.father{
+			width: 100%;
+			background-color: #fff;
+		}
+		.kaibo{
+			position: relative;
+			width: 90%;
+			height: 50px;
+			display: flex;
+			justify-content:space-between;
+			align-items: center;
+			margin: 0 auto;
+		}
+
+    .settishi{
+        position: absolute;
+        width: 100%;
+        height: 50px;
+        font-size: 12px;
+        line-height: 50px;
+        padding-left:15px;
+    }
+		.mui-table-view{
+			margin-top: 30px
+		}
+</style>
+<body>
+	<header id="header">
+		<div class="header_left" tapmode onclick="closewinkaibo()"><img src="../../img/shezhi/1.png" alt=""></div>
+		<div class="conter">设置</div>
+	</header>
+	<div class="father">
+    <div class="kaibo">
+      <span >开播提醒</span>
+      <div class="mui-switch mui-active ">
+      	<div class="mui-switch-handle"></div>
+      </div>
+    </div>
+	</div>
+    <div class="settishi">
+        <span>关闭后,不在收到Ta的开播消息提示</span>
+    </div>
+
+
+</body>
+<script type="text/javascript" src="../../script/mui.js"></script>
+<script type="text/javascript" src="../../script/mui.min.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script>
+	apiready = function () {
+		//判断按钮的初始状态
+		var isActive = $api.dom('.mui-switch').classList.contains("mui-active");
+			if(isActive){
+				openfrmgz();
+			}else{
+				closefrmgz();
+			}
+		//事件绑定
+		$api.dom('.mui-switch').addEventListener("toggle",function(event){
+			  if(event.detail.isActive){
+				openfrmgz();
+				km_toast('设置打开','2000','top')
+			  }else{
+					closefrmgz();
+					km_toast('设置关闭','2000','top')
+			  }
+		})
+	}
+	function km_toast(msg, location, duration) {
+	    location = location || 'middle';
+	    duration = duration || '2000';
+	    api.toast({
+	        msg: msg,
+	        duration: duration,
+	        location: location
+	    });
+	}
+	// 打开frame
+	function openfrmgz(){
+		var statusBar = api.require('statusBar');
+		var statusBarHeight  = statusBar.getStatusBarHeight();
+		api.openFrame({
+				name: 'kaibofrm',
+				url: 'kaibofrm.html',
+				rect: {
+						x: 0,
+						y: $api.offset($api.dom('header')).h+$api.offset($api.dom('.father')).h+$api.offset($api.dom('.settishi')).h+statusBarHeight,
+						w: 'auto',
+						h: 'auto'
+				},
+				pageParam: {
+						name: 'test'
+				},
+				bounces: true,
+				vScrollBarEnabled: true,
+				hScrollBarEnabled: true
+		});
+	}
+		// 关闭frame
+	function closefrmgz(){
+		api.closeFrame({
+		    name: 'kaibofrm'
+		});
+
+	}
+	// 关闭win
+	function closewinkaibo(){
+		api.closeWin({
+				name: 'kaibo'
+		});
+	}
+</script>
+</html>

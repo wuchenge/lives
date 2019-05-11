@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>我的爱好</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../res/mui/css/mui_min.css"/>
+</head>
+<style>
+	.textareaBox {
+	   position: relative;
+		 margin-top: 10px;
+	}
+
+	.wordsNum {
+	   position: absolute;
+		 bottom: 20px;
+	 	 right: 0px;
+	   color: #B3B3B3;
+	   font-size: 12px;
+	}
+
+</style>
+<body>
+	<div class="textareaBox">
+	    <textarea class="wishContent" placeholder="请输入你的爱好" maxlength="32" rows="5" cols="20"></textarea>
+	    <span class="wordsNum">0/32</span>
+	</div>
+</body>
+<script type="text/javascript" src="../../../res/aui/js/api.js"></script>
+<script type="text/javascript" src="../../../res/aui/js/aui_actionsheet.js" ></script>
+<script type="text/javascript" src="../../../script/vue_min.js"></script>
+<script type="text/javascript" src="../../../script/js.js"></script>
+<script type="text/javascript" src="../../../res/jquery/jquery_2_0_3.js"></script>
+<script type="text/javascript">
+//封装一个限制字数方法
+var checkStrLengths = function (str, maxLength) {
+    var maxLength = maxLength;
+    var result = 0;
+    if (str && str.length > maxLength) {
+        result = maxLength;
+    } else {
+        result = str.length;
+    }
+    return result;
+}
+//监听输入
+$(".wishContent").on('input propertychange', function () {
+    //获取输入内容
+    var userDesc = $(this).val();
+    //判断字数
+    var len;
+    if (userDesc) {
+        len = checkStrLengths(userDesc, 32);
+    } else {
+        len = 0
+    }
+    //显示字数
+    $(".wordsNum").html(len + '/32');
+});
+
+
+</script>
+</html>
